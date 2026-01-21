@@ -48,6 +48,14 @@ public class EventController {
     }
 
     /**
+     * 분석 페이지
+     */
+    @GetMapping("/analysis")
+    public String analysisPage() {
+        return "analysis";
+    }
+
+    /**
      * 이벤트 리스트 페이지 (검색/필터링 지원)
      */
     @GetMapping("/events")

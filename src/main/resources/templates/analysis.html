@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(title='분석 - EVLO', ~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title>분석 - EVLO</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="mb-6 flex justify-between items-center">
+            <h1 class="text-3xl font-bold">이벤트 로그 분석</h1>
+            <a th:href="@{/events}" 
+               class="text-gray-700 hover:text-toss-blue transition">
+                ← 이벤트 조회로 돌아가기
+            </a>
+        </div>
+
+        <!-- 분석 옵션 -->
+        <div class="bg-white rounded-lg shadow-sm border border-toss-gray-200 p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">분석 옵션</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">시작 시간</label>
+                    <input type="datetime-local" 
+                           id="startTime"
+                           class="w-full px-3 py-2 border border-toss-gray-300 rounded-lg focus:ring-2 focus:ring-toss-blue focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">종료 시간</label>
+                    <input type="datetime-local" 
+                           id="endTime"
+                           class="w-full px-3 py-2 border border-toss-gray-300 rounded-lg focus:ring-2 focus:ring-toss-blue focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Event ID (선택)</label>
+                    <input type="number" 
+                           id="eventId"
+                           placeholder="특정 Event ID만 분석"
+                           class="w-full px-3 py-2 border border-toss-gray-300 rounded-lg focus:ring-2 focus:ring-toss-blue focus:border-transparent">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button onclick="loadAnalysis()" 
+                        class="px-6 py-2 bg-toss-blue text-white rounded-lg hover:bg-blue-600 transition font-medium">
+                    분석 실행
+                </button>
+                <button onclick="loadErrorTop10()" 
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium">
+                    Error/Critical Top 10
+                </button>
+            </div>
+        </div>
+
+        <!-- Event ID별 발생 빈도 차트 -->
+        <div class="bg-white rounded-lg shadow-sm border border-toss-gray-200 p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Event ID별 발생 빈도</h2>
+            <div class="h-96">
+                <canvas id="frequencyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Error/Critical Top N 리스트 -->
+        <div class="bg-white rounded-lg shadow-sm border border-toss-gray-200 p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Error/Critical 이벤트</h2>
+            <div id="errorList" class="space-y-2">
+                <p class="text-gray-500 text-center py-8">분석 버튼을 클릭하여 결과를 확인하세요</p>
+            </div>
+        </div>
+
+        <!-- 시간대별 집중 발생 이벤트 차트 -->
+        <div class="bg-white rounded-lg shadow-sm border border-toss-gray-200 p-6">
+            <h2 class="text-xl font-semibold mb-4">시간대별 발생 빈도</h2>
+            <div class="h-96">
+                <canvas id="timeBasedChart"></canvas>
+            </div>
+        </div>
+
+        <script>
+            let frequencyChart = null;
+            let timeBasedChart = null;
+
+            // Event ID별 발생 빈도 로드
+            async function loadEventFrequency() {
+                try {
+                    const response = await fetch('/api/analysis/event-frequency?limit=20');
+                    const data = await response.json();
+
+                    const labels = data.map(item => `Event ${item.eventId}`);
+                    const counts = data.map(item => item.count);
+
+                    const ctx = document.getElementById('frequencyChart').getContext('2d');
+                    
+                    if (frequencyChart) {
+                        frequencyChart.destroy();
+                    }
+
+                    frequencyChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '발생 빈도',
+                                data: counts,
+                                backgroundColor: 'rgba(49, 130, 246, 0.5)',
+                                borderColor: 'rgba(49, 130, 246, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading event frequency:', error);
+                    alert('발생 빈도 데이터를 불러오는 중 오류가 발생했습니다.');
+                }
+            }
+
+            // Error/Critical Top N 로드
+            async function loadErrorTop10() {
+                try {
+                    const response = await fetch('/api/analysis/errors-top?n=10');
+                    const events = await response.json();
+
+                    const errorListDiv = document.getElementById('errorList');
+                    if (events.length === 0) {
+                        errorListDiv.innerHTML = '<p class="text-gray-500 text-center py-8">Error/Critical 이벤트가 없습니다.</p>';
+                        return;
+                    }
+
+                    errorListDiv.innerHTML = events.map(event => `
+                        <div class="border border-toss-gray-200 rounded-lg p-4 hover:bg-toss-gray-50 transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="font-semibold text-red-600">Event ID: ${event.eventId}</span>
+                                    <span class="ml-2 px-2 py-1 text-xs rounded-full font-medium ${
+                                        event.level === 'ERROR' ? 'bg-red-100 text-red-800' : 'bg-red-200 text-red-900'
+                                    }">${event.level}</span>
+                                </div>
+                                <span class="text-sm text-gray-500">${new Date(event.timeCreated).toLocaleString('ko-KR')}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 truncate">${event.message || '-'}</p>
+                            <p class="text-xs text-gray-500 mt-1">${event.computer || '-'}</p>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('Error loading error top:', error);
+                    alert('Error/Critical 이벤트를 불러오는 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 시간대별 집중 발생 이벤트 로드
+            async function loadTimeBasedAnalysis() {
+                const startTime = document.getElementById('startTime').value;
+                const endTime = document.getElementById('endTime').value;
+                const eventId = document.getElementById('eventId').value;
+
+                if (!startTime || !endTime) {
+                    alert('시작 시간과 종료 시간을 입력해주세요.');
+                    return;
+                }
+
+                try {
+                    const start = new Date(startTime).toISOString();
+                    const end = new Date(endTime).toISOString();
+                    
+                    let url = `/api/analysis/time-based?startTime=${start}&endTime=${end}`;
+                    if (eventId) {
+                        url = `/api/analysis/time-based/${eventId}?startTime=${start}&endTime=${end}`;
+                    }
+
+                    const response = await fetch(url);
+                    const data = await response.json();
+
+                    const labels = data.map(item => item.timeSlot);
+                    const counts = data.map(item => item.count);
+
+                    const ctx = document.getElementById('timeBasedChart').getContext('2d');
+                    
+                    if (timeBasedChart) {
+                        timeBasedChart.destroy();
+                    }
+
+                    timeBasedChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: '발생 빈도',
+                                data: counts,
+                                borderColor: 'rgba(49, 130, 246, 1)',
+                                backgroundColor: 'rgba(49, 130, 246, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading time-based analysis:', error);
+                    alert('시간대별 분석 데이터를 불러오는 중 오류가 발생했습니다.');
+                }
+            }
+
+            // 전체 분석 실행
+            async function loadAnalysis() {
+                await Promise.all([
+                    loadEventFrequency(),
+                    loadErrorTop10(),
+                    loadTimeBasedAnalysis()
+                ]);
+            }
+
+            // 페이지 로드 시 Event ID별 발생 빈도 자동 로드
+            document.addEventListener('DOMContentLoaded', function() {
+                loadEventFrequency();
+            });
+        </script>
+    </div>
+</body>
+</html>
