@@ -1,0 +1,2 @@
+-- Enum 타입은 MariaDB에서 ENUM 타입으로 정의하거나 VARCHAR로 저장
+-- JPA에서 @Enumerated(EnumType.STRING)을 사용하므로 VARCHAR로 저장

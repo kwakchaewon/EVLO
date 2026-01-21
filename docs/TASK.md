@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 프로젝트 초기 설정 완료 ✅
-- **다음 작업**: 데이터베이스 설계 (Event 엔티티, LogFile 엔티티)
+- **Week 1**: 데이터베이스 설계 완료 ✅
+- **다음 작업**: JPA Repository 생성
 
 ---
 
@@ -68,22 +68,31 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - [x] Flyway 의존성 추가
   - [x] Flyway 기본 설정 (application.yml)
   - [x] 마이그레이션 스크립트 디렉토리 구조 준비 (src/main/resources/db/migration)
-- [ ] Event 엔티티 설계
-  - [ ] 필드 정의 (EventID, Level, TimeCreated, Provider, Computer, Message 등)
-  - [ ] 인덱스 설계 (TimeCreated, EventID, Level)
-  - [ ] Enum 타입 정의 (EventLevel, LogChannel)
-- [ ] LogFile 메타정보 엔티티 설계
-  - [ ] 파일명, 크기, 업로드 시간
-  - [ ] 파싱 상태 (진행중, 완료, 실패)
-  - [ ] Event 엔티티와 OneToMany 관계
+- [x] Event 엔티티 설계
+  - [x] 필드 정의 (EventID, Level, TimeCreated, Provider, Computer, Message 등)
+  - [x] 인덱스 설계 (TimeCreated, EventID, Level, Channel)
+  - [x] Enum 타입 정의 (EventLevel, LogChannel, ParsingStatus)
+- [x] LogFile 메타정보 엔티티 설계
+  - [x] 파일명, 크기, 업로드 시간
+  - [x] 파싱 상태 (진행중, 완료, 실패)
+  - [x] Event 엔티티와 OneToMany 관계
+- [x] Flyway 마이그레이션 스크립트 작성
+  - [x] V2__create_log_files_table.sql
+  - [x] V3__create_events_table.sql
+  - [x] 인덱스 및 외래키 설정
 - [ ] JPA Repository 생성
   - [ ] EventRepository 인터페이스
   - [ ] LogFileRepository 인터페이스
   - [ ] Custom Query 메서드 정의
-- [ ] Hibernate batch 설정
-  - [ ] `spring.jpa.properties.hibernate.jdbc.batch_size: 1000`
-  - [ ] `spring.jpa.properties.hibernate.order_inserts: true`
-  - [ ] `spring.jpa.properties.hibernate.order_updates: true`
+- [x] Hibernate batch 설정 (이미 완료)
+  - [x] `spring.jpa.properties.hibernate.jdbc.batch_size: 1000`
+  - [x] `spring.jpa.properties.hibernate.order_inserts: true`
+  - [x] `spring.jpa.properties.hibernate.order_updates: true`
+
+**다음 작업 정보:**
+- JPA Repository 인터페이스 생성 필요
+- EventRepository: 기본 CRUD + 검색/필터링 메서드
+- LogFileRepository: 기본 CRUD + 파싱 상태별 조회 메서드
 
 ### 2.3 EVTX 파서 PoC
 - [ ] EVTX 파싱 라이브러리 선정 및 통합
