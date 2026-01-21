@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 기본 UI 구현 완료 ✅
-- **다음 작업**: 검색/필터링 기능 구현
+- **Week 2**: 검색/필터링 기능 구현 완료 ✅
+- **다음 작업**: Redis 캐싱 구현
 
 ---
 
@@ -203,28 +203,33 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 ## Week 2: 검색/필터링 및 분석 기능
 
 ### 3.1 검색 및 필터링
-- [ ] 검색 조건 DTO 설계
-  - [ ] EventSearchRequest DTO
-  - [ ] 검증 어노테이션 추가
-- [ ] 기간 필터 구현
-  - [ ] LocalDateTime 기반 날짜 범위 필터
-  - [ ] 시간대 처리
-- [ ] 로그 종류 필터
-  - [ ] System/Application/Security/Setup/ForwardedEvents
-  - [ ] 다중 선택 지원
-- [ ] Event Level 필터
-  - [ ] Information/Warning/Error/Critical
-  - [ ] 다중 선택 지원
-- [ ] Event ID 필터
-  - [ ] 단일 또는 다중 Event ID 필터
-  - [ ] 범위 검색 지원 (선택)
-- [ ] Message 키워드 검색
-  - [ ] Full-text search 또는 LIKE 검색
-  - [ ] 대소문자 구분 옵션
-- [ ] 필터 UI 구현
-  - [ ] 필터 폼 (TOSS 스타일)
-  - [ ] 동적 필터 조합
-  - [ ] 필터 초기화 기능
+- [x] 검색 조건 DTO 설계
+  - [x] EventSearchRequest DTO
+  - [x] 검증 어노테이션 추가 (@Min)
+- [x] 기간 필터 구현
+  - [x] LocalDateTime 기반 날짜 범위 필터
+  - [x] 시간대 처리 (datetime-local)
+- [x] 로그 종류 필터
+  - [x] System/Application/Security/Setup/ForwardedEvents
+  - [x] 다중 선택 지원 (multiple select)
+- [x] Event Level 필터
+  - [x] Information/Warning/Error/Critical
+  - [x] 다중 선택 지원 (multiple select)
+- [x] Event ID 필터
+  - [x] 다중 Event ID 필터 (쉼표로 구분)
+  - [ ] 범위 검색 지원 (추후 구현 가능)
+- [x] Message 키워드 검색
+  - [x] LIKE 검색 (대소문자 구분 안 함)
+  - [ ] 대소문자 구분 옵션 (추후 구현 가능)
+- [x] 필터 UI 구현
+  - [x] 필터 폼 (TOSS 스타일)
+  - [x] 동적 필터 조합 (복합 검색)
+  - [x] 필터 초기화 기능
+
+**다음 작업 정보:**
+- Redis 캐싱 구현 필요
+- 자주 사용되는 검색 조건 캐싱
+- 파싱 진행률 조회 API 개선
 
 ### 3.2 Redis 캐싱
 - [ ] 업로드 파일 메타정보 Redis 저장
