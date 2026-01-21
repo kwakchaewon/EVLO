@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(title='로그 업로드 - EVLO', ~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title>로그 업로드 - EVLO</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="max-w-3xl mx-auto">
+            <h1 class="text-3xl font-bold mb-8">로그 파일 업로드</h1>
+
+            <!-- 업로드 영역 -->
+            <div class="bg-white rounded-lg shadow-sm border-2 border-dashed border-toss-gray-300 p-12 text-center mb-6"
+                 id="uploadArea"
+                 ondrop="handleDrop(event)" 
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)">
+                <div class="py-8">
+                    <div class="text-5xl mb-4">📁</div>
+                    <p class="text-lg font-medium text-gray-700 mb-2">
+                        파일을 드래그하거나 클릭하여 업로드
+                    </p>
+                    <p class="text-sm text-gray-500 mb-4">
+                        .evtx 파일만 업로드 가능 (최대 200MB)
+                    </p>
+                    <input type="file" 
+                           id="fileInput" 
+                           accept=".evtx" 
+                           multiple 
+                           class="hidden" 
+                           onchange="handleFileSelect(event)">
+                    <button onclick="document.getElementById('fileInput').click()" 
+                            class="bg-toss-blue text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition">
+                        파일 선택
+                    </button>
+                </div>
+            </div>
+
+            <!-- 업로드 파일 목록 -->
+            <div id="fileList" class="space-y-3 mb-6"></div>
+
+            <!-- 업로드 버튼 -->
+            <button id="uploadBtn" 
+                    onclick="uploadFiles()" 
+                    class="w-full bg-toss-blue text-white py-3 rounded-lg hover:bg-blue-600 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                업로드 시작
+            </button>
+
+            <!-- 진행률 표시 -->
+            <div id="progressContainer" class="mt-6 hidden">
+                <div class="bg-white rounded-lg p-6">
+                    <h3 class="font-semibold mb-4">업로드 진행률</h3>
+                    <div id="progressList" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let selectedFiles = [];
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('border-toss-blue', 'bg-toss-gray-50');
+            }
+
+            function handleDragLeave(e) {
+                e.currentTarget.classList.remove('border-toss-blue', 'bg-toss-gray-50');
+            }
+
+            function handleDrop(e) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-toss-blue', 'bg-toss-gray-50');
+                
+                const files = Array.from(e.dataTransfer.files).filter(file => 
+                    file.name.toLowerCase().endsWith('.evtx')
+                );
+                addFiles(files);
+            }
+
+            function handleFileSelect(e) {
+                const files = Array.from(e.target.files);
+                addFiles(files);
+            }
+
+            function addFiles(files) {
+                files.forEach(file => {
+                    if (file.size > 200 * 1024 * 1024) {
+                        alert(`파일 크기가 너무 큽니다: ${file.name} (최대 200MB)`);
+                        return;
+                    }
+                    if (!selectedFiles.find(f => f.name === file.name)) {
+                        selectedFiles.push(file);
+                    }
+                });
+                updateFileList();
+            }
+
+            function removeFile(index) {
+                selectedFiles.splice(index, 1);
+                updateFileList();
+            }
+
+            function updateFileList() {
+                const fileListDiv = document.getElementById('fileList');
+                const uploadBtn = document.getElementById('uploadBtn');
+                
+                if (selectedFiles.length === 0) {
+                    fileListDiv.innerHTML = '';
+                    uploadBtn.disabled = true;
+                    return;
+                }
+
+                fileListDiv.innerHTML = selectedFiles.map((file, index) => `
+                    <div class="bg-white rounded-lg p-4 flex items-center justify-between border border-toss-gray-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-2xl">📄</div>
+                            <div>
+                                <p class="font-medium">${file.name}</p>
+                                <p class="text-sm text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                        </div>
+                        <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+                            ✕
+                        </button>
+                    </div>
+                `).join('');
+                
+                uploadBtn.disabled = false;
+            }
+
+            async function uploadFiles() {
+                if (selectedFiles.length === 0) return;
+
+                const formData = new FormData();
+                selectedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                document.getElementById('uploadBtn').disabled = true;
+                document.getElementById('progressContainer').classList.remove('hidden');
+                
+                try {
+                    const response = await fetch('/api/upload/multiple', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const results = await response.json();
+                    displayResults(results);
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('업로드 중 오류가 발생했습니다.');
+                } finally {
+                    selectedFiles = [];
+                    updateFileList();
+                    document.getElementById('uploadBtn').disabled = true;
+                }
+            }
+
+            function displayResults(results) {
+                const progressList = document.getElementById('progressList');
+                progressList.innerHTML = results.map(result => `
+                    <div class="border-b border-toss-gray-200 pb-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium">${result.filename || 'Unknown'}</span>
+                            <span class="text-sm ${result.status === 'COMPLETED' ? 'text-green-600' : 'text-red-600'}">
+                                ${result.status}
+                            </span>
+                        </div>
+                        ${result.status === 'COMPLETED' ? `
+                            <p class="text-sm text-gray-600">파일 ID: ${result.fileId}</p>
+                        ` : `
+                            <p class="text-sm text-red-600">${result.message}</p>
+                        `}
+                    </div>
+                `).join('');
+            }
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title : 'EVLO - Windows 이벤트 로그 분석'}">EVLO</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- TOSS 스타일 기본 설정 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'toss-blue': '#3182F6',
+                        'toss-gray-50': '#F9FAFB',
+                        'toss-gray-100': '#F3F4F6',
+                        'toss-gray-200': '#E5E7EB',
+                        'toss-gray-300': '#D1D5DB',
+                        'toss-gray-900': '#111827',
+                    },
+                    fontFamily: {
+                        'toss': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+                    },
+                    spacing: {
+                        '18': '4.5rem',
+                        '88': '22rem',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* TOSS 스타일 기본 타이포그래피 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* 넓은 여백 */
+        .container-toss {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+    </style>
+</head>
+<body class="bg-toss-gray-50 font-toss text-toss-gray-900">
+    <!-- 헤더 -->
+    <header class="bg-white border-b border-toss-gray-200 sticky top-0 z-50">
+        <nav class="container-toss py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-8">
+                    <a th:href="@{/}" class="text-2xl font-bold text-toss-blue">EVLO</a>
+                    <div class="hidden md:flex space-x-6">
+                        <a th:href="@{/}" class="text-gray-700 hover:text-toss-blue transition">홈</a>
+                        <a th:href="@{/upload}" class="text-gray-700 hover:text-toss-blue transition">로그 업로드</a>
+                        <a th:href="@{/events}" class="text-gray-700 hover:text-toss-blue transition">이벤트 조회</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="min-h-screen">
+        <div class="container-toss py-8">
+            <div th:replace="~{::content}">Content goes here</div>
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-white border-t border-toss-gray-200 mt-auto">
+        <div class="container-toss py-6">
+            <p class="text-sm text-gray-600 text-center">© 2024 EVLO - Windows Event Log Analysis System</p>
+        </div>
+    </footer>
+</body>
+</html>

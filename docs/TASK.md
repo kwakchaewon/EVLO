@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 스트리밍 처리 및 Batch 저장 최적화 완료 ✅
-- **다음 작업**: 기본 UI 구현 (Thymeleaf, Tailwind CSS)
+- **Week 1**: 기본 UI 구현 완료 ✅
+- **다음 작업**: 검색/필터링 기능 구현
 
 ---
 
@@ -172,26 +172,31 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - 진행률 표시 UI 구현 (프론트엔드)
 
 ### 2.6 기본 UI (Thymeleaf)
-- [ ] Tailwind CSS 설정 (또는 Alpine.js)
-  - [ ] Tailwind CSS CDN 또는 빌드 설정
-  - [ ] 커스텀 디자인 토큰 정의
-- [ ] TOSS 스타일 디자인 시스템 기본 구성
-  - [ ] 컬러 팔레트 정의
-  - [ ] 타이포그래피 설정
-  - [ ] 레이아웃 컴포넌트 (헤더, 네비게이션)
-- [ ] 로그 업로드 페이지 구현
-  - [ ] Drag & Drop UI
-  - [ ] 파일 선택 버튼
-  - [ ] 업로드 진행률 표시
-  - [ ] 다중 파일 업로드 UI
-- [ ] 기본 로그 리스트 화면 구현
-  - [ ] 테이블 UI (TOSS 스타일)
-  - [ ] 컬럼 구성 (EventID, Level, TimeCreated, Provider, Computer, Message)
-  - [ ] 반응형 디자인
-- [ ] 페이징 구현
-  - [ ] 서버 사이드 페이징
-  - [ ] 페이지네이션 UI
-  - [ ] 페이지 크기 선택
+- [x] Tailwind CSS 설정 (또는 Alpine.js)
+  - [x] Tailwind CSS CDN 설정
+  - [x] 커스텀 디자인 토큰 정의 (TOSS 컬러, 타이포그래피)
+- [x] TOSS 스타일 디자인 시스템 기본 구성
+  - [x] 컬러 팔레트 정의 (toss-blue, toss-gray 시리즈)
+  - [x] 타이포그래피 설정 (TOSS 폰트)
+  - [x] 레이아웃 컴포넌트 (base.html - 헤더, 네비게이션, 푸터)
+- [x] 로그 업로드 페이지 구현
+  - [x] Drag & Drop UI
+  - [x] 파일 선택 버튼
+  - [x] 업로드 결과 표시
+  - [x] 다중 파일 업로드 UI
+- [x] 기본 로그 리스트 화면 구현
+  - [x] 테이블 UI (TOSS 스타일)
+  - [x] 컬럼 구성 (EventID, Level, TimeCreated, Provider, Computer, Message)
+  - [x] 반응형 디자인
+- [x] 페이징 구현
+  - [x] 서버 사이드 페이징
+  - [x] 페이지네이션 UI
+  - [x] 컬럼 정렬 기능
+
+**다음 작업 정보:**
+- 검색/필터링 기능 구현 필요
+- 검색 조건 DTO 설계
+- 필터 UI 구현
 
 ---
 
