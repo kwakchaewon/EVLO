@@ -47,6 +47,9 @@ dependencies {
     // PDF Library (OpenPDF)
     implementation 'com.github.librepdf:openpdf:1.3.30'
     
+    // EVTX Parser
+    implementation 'com.github.palindromicity:simple-evtx:2.2.0'
+    
     // Lombok (optional but recommended)
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

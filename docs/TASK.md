@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 데이터베이스 설계 및 Repository 생성 완료 ✅
-- **다음 작업**: EVTX 파서 PoC (라이브러리 선정 및 통합)
+- **Week 1**: EVTX 파서 PoC 기본 구현 완료 ✅
+- **다음 작업**: 단위 테스트 작성 및 파일 업로드 기능 구현
 
 ---
 
@@ -111,20 +111,25 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - LogFileRepository: 기본 CRUD + 파싱 상태별 조회 메서드
 
 ### 2.3 EVTX 파서 PoC
-- [ ] EVTX 파싱 라이브러리 선정 및 통합
-  - [ ] evtx4j 또는 다른 Java EVTX 파서 조사
-  - [ ] 의존성 추가 및 테스트
-- [ ] EVTX → Event 엔티티 변환 로직 구현
-  - [ ] 필수 필드 매핑 (EventID, Level, TimeCreated, Provider, Computer, Message)
-  - [ ] 로그 종류(Channel) 추출 로직
-  - [ ] 예외 처리
-- [ ] 파싱 서비스 클래스 작성
-  - [ ] EvtxParserService 인터페이스 및 구현
-  - [ ] 스트리밍 파싱 메서드
-  - [ ] 진행률 추적 기능
+- [x] EVTX 파싱 라이브러리 선정 및 통합
+  - [x] palindromicity/simple-evtx 라이브러리 선택
+  - [x] 의존성 추가 (build.gradle)
+- [x] EVTX → Event 엔티티 변환 로직 구현
+  - [x] 필수 필드 매핑 (EventID, Level, TimeCreated, Provider, Computer, Message)
+  - [x] 로그 종류(Channel) 추출 로직
+  - [x] 예외 처리 (EvtxParsingException)
+- [x] 파싱 서비스 클래스 작성
+  - [x] EvtxParserService 구현
+  - [ ] 스트리밍 파싱 메서드 (추후 구현)
+  - [ ] 진행률 추적 기능 (추후 구현)
 - [ ] 단위 테스트 작성
   - [ ] 샘플 EVTX 파일로 파싱 테스트
   - [ ] 필드 매핑 검증
+
+**다음 작업 정보:**
+- 단위 테스트 작성 필요
+- 스트리밍 파싱 및 진행률 추적 기능 (파일 업로드 기능과 통합 시 구현)
+- 샘플 EVTX 파일 준비 필요
 
 ### 2.4 파일 업로드 기능
 - [ ] WebFlux MultipartFile 업로드 API 구현
