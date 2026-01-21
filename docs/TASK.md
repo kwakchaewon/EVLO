@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 2**: 분석 페이지 UI 및 차트 시각화 구현 완료 ✅
-- **다음 작업**: AI 기반 로그 요약 기능 (Spring AI)
+- **Week 2**: AI 기반 로그 요약 기능 구현 완료 ✅
+- **다음 작업**: PDF 분석 보고서 생성 기능
 
 ---
 
@@ -279,22 +279,27 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - CSV/JSON 내보내기 기능
 
 ### 3.4 AI 로그 요약
-- [ ] Spring AI 의존성 추가 및 설정
-  - [ ] spring-ai-openai-spring-boot-starter
-  - [ ] OpenAI API 키 설정
-- [ ] OpenAI API 연동 (또는 다른 AI 모델)
-  - [ ] ChatClient 설정
-  - [ ] 모델 선택 (GPT-4, GPT-3.5-turbo 등)
-- [ ] 로그 요약 서비스 구현
-  - [ ] 전체 로그 요약 기능
-  - [ ] Error/Critical 이벤트 중심 요약
-  - [ ] 프롬프트 엔지니어링
-- [ ] 장애 원인 추정 기능
-  - [ ] Error 이벤트 패턴 분석
-  - [ ] 원인 추론 프롬프트
-- [ ] 초보자용 설명 생성 기능
-  - [ ] Event ID별 설명 생성
-  - [ ] 사용자 친화적 언어로 변환
+- [x] Spring AI 의존성 추가 및 설정
+  - [x] spring-ai-openai-spring-boot-starter (이미 추가됨)
+  - [x] OpenAI API 키 설정 (환경변수: OPENAI_API_KEY)
+- [x] OpenAI API 연동 (또는 다른 AI 모델)
+  - [x] ChatClient 설정 (자동 구성)
+  - [x] 모델 선택 (gpt-3.5-turbo)
+- [x] 로그 요약 서비스 구현
+  - [x] 전체 로그 요약 기능 (AiSummaryService)
+  - [x] Error/Critical 이벤트 중심 요약
+  - [x] 프롬프트 엔지니어링 (한국어 요약)
+- [x] 장애 원인 추정 기능
+  - [x] Error 이벤트 패턴 분석
+  - [x] 원인 추론 프롬프트
+- [x] 초보자용 설명 생성 기능
+  - [x] Event ID별 설명 생성
+  - [x] 사용자 친화적 언어로 변환
+
+**다음 작업 정보:**
+- PDF 분석 보고서 생성 기능
+- CSV/JSON 내보내기 기능
+- 전역 예외 처리 및 에러 페이지
 
 ### 3.5 PDF 생성 기능
 - [ ] PDF 라이브러리 선정 및 통합
