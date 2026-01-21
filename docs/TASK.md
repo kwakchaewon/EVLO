@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 데이터베이스 설계 완료 ✅
-- **다음 작업**: JPA Repository 생성
+- **Week 1**: 데이터베이스 설계 및 Repository 생성 완료 ✅
+- **다음 작업**: EVTX 파서 PoC (라이브러리 선정 및 통합)
 
 ---
 
@@ -80,10 +80,26 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - [x] V2__create_log_files_table.sql
   - [x] V3__create_events_table.sql
   - [x] 인덱스 및 외래키 설정
-- [ ] JPA Repository 생성
-  - [ ] EventRepository 인터페이스
-  - [ ] LogFileRepository 인터페이스
-  - [ ] Custom Query 메서드 정의
+- [x] JPA Repository 생성
+  - [x] EventRepository 인터페이스
+    - [x] 기본 CRUD 메서드
+    - [x] 검색/필터링 메서드 (기간, Level, Channel, Event ID, 키워드)
+    - [x] 복합 검색 메서드 (findByFilters)
+    - [x] Error/Critical Top N 조회
+    - [x] Event ID별 발생 빈도 조회
+    - [x] 시간대별 집중 발생 이벤트 분석
+  - [x] LogFileRepository 인터페이스
+    - [x] 기본 CRUD 메서드
+    - [x] 파싱 상태별 조회
+    - [x] 파일명 검색
+    - [x] 업로드 시간 범위 조회
+    - [x] 최근 업로드 파일 조회
+  - [x] Custom Query 메서드 정의
+
+**다음 작업 정보:**
+- EVTX 파서 라이브러리 조사 및 선정 필요
+- Java용 EVTX 파서 옵션: evtx4j, palindromicity/evtx, jSQLParser 등
+- EVTX → Event 엔티티 변환 로직 구현 필요
 - [x] Hibernate batch 설정 (이미 완료)
   - [x] `spring.jpa.properties.hibernate.jdbc.batch_size: 1000`
   - [x] `spring.jpa.properties.hibernate.order_inserts: true`
