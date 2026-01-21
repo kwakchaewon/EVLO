@@ -297,7 +297,8 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - [x] 사용자 친화적 언어로 변환
 
 **다음 작업 정보:**
-- 전역 예외 처리 및 에러 페이지
+- 내보내기 UI 구현 (CSV/JSON/PDF 선택)
+- 전역 예외 페이지 (뷰) 추가
 
 ### 3.5 PDF 생성 기능
 - [x] PDF 라이브러리 선정 및 통합
@@ -451,12 +452,12 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - 프로젝트 기본 패키지 구조 설정 (com.evlo.{domain})
 
 ### 6.1 에러 처리
-- [ ] 전역 예외 처리 구현
-  - [ ] @ControllerAdvice 클래스 작성
-  - [ ] 공통 에러 응답 형식 정의
-- [ ] 커스텀 예외 클래스 작성
-  - [ ] EvtxParsingException
-  - [ ] FileValidationException
+- [x] 전역 예외 처리 구현
+  - [x] @ControllerAdvice 클래스 작성 (GlobalExceptionHandler)
+  - [x] 공통 에러 응답 형식 정의 (ErrorResponse)
+- [x] 커스텀 예외 클래스 작성
+  - [x] EvtxParsingException
+  - [x] FileValidationException
   - [ ] DataNotFoundException 등
 - [ ] 에러 응답 DTO 표준화
   - [ ] ErrorResponse DTO
