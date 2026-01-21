@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 2**: Redis 캐싱 구현 완료 ✅
-- **다음 작업**: 분석 기능 구현
+- **Week 2**: 분석 기능 API 구현 완료 ✅
+- **다음 작업**: 분석 결과 차트 시각화 및 AI 기반 로그 요약
 
 ---
 
@@ -256,20 +256,27 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - [ ] Redis 직렬화 설정
 
 ### 3.3 분석 기능
-- [ ] Event ID별 발생 빈도 통계 API
-  - [ ] GET /api/analysis/event-frequency
-  - [ ] 그룹화 및 정렬
-  - [ ] 차트용 데이터 형식
-- [ ] Error/Critical Top N 조회 API
-  - [ ] GET /api/analysis/errors-top
-  - [ ] N 파라미터로 개수 지정
-  - [ ] 시간대별 집계 옵션
-- [ ] 시간대별 집중 발생 이벤트 분석
-  - [ ] 시간 단위 그룹화 (1시간, 1일 등)
-  - [ ] 통계 데이터 반환
-- [ ] 통계 데이터 DTO 설계
-  - [ ] EventFrequencyResponse
-  - [ ] TimeBasedStatisticsResponse
+- [x] Event ID별 발생 빈도 통계 API
+  - [x] GET /api/analysis/event-frequency
+  - [x] 그룹화 및 정렬 (빈도순)
+  - [x] 차트용 데이터 형식 (EventFrequencyResponse)
+  - [x] limit 파라미터로 결과 개수 제한
+- [x] Error/Critical Top N 조회 API
+  - [x] GET /api/analysis/errors-top
+  - [x] N 파라미터로 개수 지정
+  - [x] 시간순 정렬 (최신순)
+- [x] 시간대별 집중 발생 이벤트 분석
+  - [x] 시간 단위 그룹화 (1시간 단위)
+  - [x] 통계 데이터 반환 (TimeBasedAnalysisResponse)
+  - [x] 전체 이벤트 및 특정 Event ID별 분석 지원
+- [x] 통계 데이터 DTO 설계
+  - [x] EventFrequencyResponse
+  - [x] TimeBasedAnalysisResponse
+
+**다음 작업 정보:**
+- 분석 결과 차트 시각화 (Chart.js)
+- 분석 페이지 UI 구현
+- AI 기반 로그 요약 기능 (Spring AI)
 
 ### 3.4 AI 로그 요약
 - [ ] Spring AI 의존성 추가 및 설정
