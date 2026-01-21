@@ -1,4 +1,4 @@
-# TASK.md 기반 커밋 메시지 템플릿
+# TASK.md 기반 커밋 메시지 템플릿 (한글)
 # 
 # 변경사항 유형을 선택하세요:
 #   feat: 새로운 기능 추가
@@ -18,14 +18,15 @@
 #   부가 작업: 에러 처리, 로깅, 테스트, Docker
 #
 # 아래는 자동으로 생성된 제안입니다. 필요시 수정하세요:
+# 주의: 커밋 메시지는 한글로 작성합니다.
 
-<type>(<scope>): <subject>
+<type>(<scope>): <한글 subject>
 
 # Week <number>: <section>
 # 예: feat(parser): EVTX 파싱 서비스 구현
 #     fix(upload): 파일 크기 검증 로직 수정
 
-<body>
+<body (한글로 작성)>
 
 # 관련 작업 목록 (TASK.md 참고):
 # - [ ] 작업 1
