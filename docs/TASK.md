@@ -1,5 +1,16 @@
 # Windows 이벤트 로그 분석 웹 시스템 - 개발 작업 목록
 
+## 📊 작업 상태 요약
+- **[x] 완료**: 작업 완료
+- **[-] 진행 중**: 현재 작업 중
+- **[ ] 예정**: 작업 예정
+
+### 현재 진행 상황
+- **Week 1**: 프로젝트 초기 설정 완료 ✅
+- **다음 작업**: 데이터베이스 설계 (Event 엔티티, LogFile 엔티티)
+
+---
+
 ## 프로젝트 개요
 
 ### 목적
@@ -25,26 +36,32 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 ## Week 1: 프로젝트 초기 설정 및 기본 기능
 
 ### 2.1 프로젝트 세팅
-- [ ] Spring Boot 3.x 프로젝트 생성 (Gradle)
-  - [ ] Spring Initializr 또는 수동 생성
-  - [ ] 프로젝트 구조 설정
-- [ ] WebFlux 의존성 추가
-  - [ ] spring-boot-starter-webflux
-  - [ ] spring-boot-starter-thymeleaf (WebFlux용)
-- [ ] JPA + Hibernate 설정
-  - [ ] spring-boot-starter-data-jpa
-  - [ ] MariaDB Driver 의존성
-- [ ] Redis 의존성 및 설정
-  - [ ] spring-boot-starter-data-redis-reactive
-  - [ ] Lettuce 클라이언트 설정
-- [ ] Thymeleaf 설정
-  - [ ] Thymeleaf Layout Dialect (선택)
-  - [ ] Thymeleaf 템플릿 디렉토리 구조
-- [ ] application.yml 기본 설정
-  - [ ] 프로파일 설정 (dev, prod)
-  - [ ] 데이터베이스 연결 설정
-  - [ ] Redis 연결 설정
-  - [ ] 로깅 설정
+- [x] Spring Boot 3.x 프로젝트 생성 (Gradle)
+  - [x] Spring Initializr 또는 수동 생성
+  - [x] 프로젝트 구조 설정
+- [x] WebFlux 의존성 추가
+  - [x] spring-boot-starter-webflux
+  - [x] spring-boot-starter-thymeleaf (WebFlux용)
+- [x] JPA + Hibernate 설정
+  - [x] spring-boot-starter-data-jpa
+  - [x] MariaDB Driver 의존성
+- [x] Redis 의존성 및 설정
+  - [x] spring-boot-starter-data-redis-reactive
+  - [x] Lettuce 클라이언트 설정
+- [x] Thymeleaf 설정
+  - [x] Thymeleaf Layout Dialect (선택)
+  - [x] Thymeleaf 템플릿 디렉토리 구조
+- [x] application.yml 기본 설정
+  - [x] 프로파일 설정 (dev, prod)
+  - [x] 데이터베이스 연결 설정
+  - [x] Redis 연결 설정
+  - [x] 로깅 설정
+
+**다음 작업 정보:**
+- Event 엔티티 설계 필요
+- 필드: EventID, Level, TimeCreated, Provider, Computer, Message
+- 인덱스: TimeCreated, EventID, Level
+- Enum 타입: EventLevel (Information/Warning/Error/Critical), LogChannel (System/Application/Security/Setup/ForwardedEvents)
 
 ### 2.2 데이터베이스 설계
 - [ ] Event 엔티티 설계
@@ -339,6 +356,29 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 
 ## 부가 작업
 
+### 0.1 프로젝트 문서화
+- [x] 프로젝트 README 초안 작성
+  - [x] 프로젝트 개요 및 목적 설명
+  - [x] 주요 기능 및 기술 스택 소개
+  - [x] 설치 및 실행 가이드
+  - [x] 개발 가이드 및 문서 링크
+- [x] Git 커밋 메시지 자동 제안 설정
+  - [x] 커밋 템플릿 (.gitmessage) 생성
+  - [x] Git Hook (prepare-commit-msg) 설정
+  - [x] 커밋 메시지 제안 스크립트 작성 (Bash/PowerShell)
+  - [x] Git 설정 가이드 문서 작성 (SETUP-GIT.md, README-GIT.md)
+- [x] Cursor Rules 작성
+  - [x] 코드 스타일 및 컨벤션 정의
+  - [x] 필수 규칙 및 금지 사항 명시
+- [x] TASK.md 작업 트래커 구성
+  - [x] 작업 상태 표시 방법 정의 ([x] 완료, [-] 진행 중, [ ] 예정)
+  - [x] 작업 상태 요약 섹션 추가
+
+**다음 작업 정보:**
+- Spring Boot 3.x 프로젝트 생성 필요
+- Gradle 빌드 파일 작성
+- 프로젝트 기본 패키지 구조 설정 (com.evlo.{domain})
+
 ### 6.1 에러 처리
 - [ ] 전역 예외 처리 구현
   - [ ] @ControllerAdvice 클래스 작성
@@ -404,6 +444,27 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - HTTPS/TLS, Nginx, 보안 헤더
 - **P3**: PQC 실습 (Week 4, 선택)
   - PQC Gateway 및 Hybrid TLS
+
+## 📝 작업 트래커 업데이트 가이드
+
+작업 완료 시 TASK.md를 업데이트하세요:
+
+1. **완료된 작업**: `[ ]` → `[x]`
+2. **진행 중인 작업**: `[ ]` → `[-]`
+3. **다음 작업 정보 추가**: 해당 섹션 하단에 컴팩트한 정보 기록
+
+**예시:**
+```markdown
+### 2.1 프로젝트 세팅
+- [-] Spring Boot 3.x 프로젝트 생성 (Gradle)
+  - [x] Spring Initializr 또는 수동 생성
+  - [-] 프로젝트 구조 설정
+
+**다음 작업 정보:**
+- build.gradle 파일 작성 필요
+- 기본 패키지 구조 생성 (com.evlo)
+- application.yml 기본 설정 파일 생성
+```
 
 ## 의존성
 

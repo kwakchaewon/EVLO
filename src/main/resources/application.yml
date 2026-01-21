@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: evlo
+  
+  profiles:
+    active: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  
+  datasource:
+    url: jdbc:mariadb://localhost:3306/evlo?useUnicode=true&characterEncoding=utf8
+    username: evlo_user
+    password: evlo_password
+    driver-class-name: org.mariadb.jdbc.Driver
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 1000
+        order_inserts: true
+        order_updates: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+  
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
+    com.evlo: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  
+  datasource:
+    url: ${DB_URL:jdbc:mariadb://localhost:3306/evlo}
+    username: ${DB_USERNAME:evlo_user}
+    password: ${DB_PASSWORD:evlo_password}
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+logging:
+  level:
+    root: WARN
+    com.evlo: INFO
