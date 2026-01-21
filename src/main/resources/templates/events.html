@@ -93,16 +93,35 @@
                 <input type="hidden" th:name="sortDir" th:value="${sortDir}">
 
                 <!-- 버튼 -->
-                <div class="flex justify-end space-x-3">
-                    <button type="button" 
-                            onclick="resetFilters()" 
-                            class="px-4 py-2 border border-toss-gray-300 rounded-lg hover:bg-toss-gray-50 transition">
-                        초기화
-                    </button>
-                    <button type="submit" 
-                            class="px-4 py-2 bg-toss-blue text-white rounded-lg hover:bg-blue-600 transition">
-                        검색
-                    </button>
+                <div class="flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button"
+                                onclick="exportData('csv')"
+                                class="px-3 py-2 border border-toss-gray-300 rounded-lg hover:bg-toss-gray-50 transition text-sm">
+                            CSV 내보내기
+                        </button>
+                        <button type="button"
+                                onclick="exportData('json')"
+                                class="px-3 py-2 border border-toss-gray-300 rounded-lg hover:bg-toss-gray-50 transition text-sm">
+                            JSON 내보내기
+                        </button>
+                        <button type="button"
+                                onclick="exportData('pdf')"
+                                class="px-3 py-2 border border-toss-gray-300 rounded-lg hover:bg-toss-gray-50 transition text-sm">
+                            PDF 내보내기
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" 
+                                onclick="resetFilters()" 
+                                class="px-4 py-2 border border-toss-gray-300 rounded-lg hover:bg-toss-gray-50 transition">
+                            초기화
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-toss-blue text-white rounded-lg hover:bg-blue-600 transition">
+                            검색
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -214,6 +233,49 @@
 
         function resetFilters() {
             window.location.href = '/events';
+        }
+
+        function exportData(type) {
+            const form = document.getElementById('searchForm');
+            const params = new URLSearchParams();
+
+            const appendAll = (name) => {
+                const el = form.querySelector(`[name="${name}"]`);
+                if (!el) return;
+                if (el.tagName === 'SELECT' && el.multiple) {
+                    Array.from(el.selectedOptions).forEach(opt => params.append(name, opt.value));
+                } else if (el.value) {
+                    params.append(name, el.value);
+                }
+            };
+
+            appendAll('startTime');
+            appendAll('endTime');
+            appendAll('keyword');
+            appendAll('eventIds');
+            appendAll('page');
+            appendAll('size');
+            appendAll('sortBy');
+            appendAll('sortDir');
+
+            // multi-select
+            ['levels', 'channels'].forEach(name => {
+                const select = form.querySelector(`select[name="${name}"]`);
+                if (select) {
+                    Array.from(select.selectedOptions).forEach(opt => params.append(name, opt.value));
+                }
+            });
+
+            const eventIdsInput = form.querySelector('input[name="eventIds"]');
+            if (eventIdsInput && eventIdsInput.value) {
+                params.set('eventIds', eventIdsInput.value.replace(/\s+/g, ''));
+            }
+
+            let endpoint = '/api/export/csv';
+            if (type === 'json') endpoint = '/api/export/json';
+            if (type === 'pdf') endpoint = '/api/export/pdf';
+
+            window.location.href = `${endpoint}?${params.toString()}`;
         }
 
         // Event ID 입력 처리 (쉼표로 구분된 숫자)

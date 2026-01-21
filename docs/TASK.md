@@ -297,8 +297,7 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
   - [x] 사용자 친화적 언어로 변환
 
 **다음 작업 정보:**
-- 내보내기 UI 구현 (CSV/JSON/PDF 선택)
-- 전역 예외 페이지 (뷰) 추가
+- 도메인/DNS/HTTPS 설정 (Week 3)
 
 ### 3.5 PDF 생성 기능
 - [x] PDF 라이브러리 선정 및 통합
@@ -321,10 +320,10 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - [x] JSON 다운로드 API 구현
   - [x] GET /api/export/json
   - [x] 필터 조건 반영
-- [ ] 내보내기 UI 구현
-  - [ ] 내보내기 버튼 (TOSS 스타일)
-  - [ ] 형식 선택 (CSV, JSON, PDF)
-  - [ ] 다운로드 진행 표시
+- [x] 내보내기 UI 구현
+  - [x] 내보내기 버튼 (이벤트 목록 필터와 연동)
+  - [x] 형식 선택 (CSV, JSON, PDF)
+  - [ ] 다운로드 진행 표시 (선택)
 
 ### 3.7 성능 테스트
 - [ ] 대용량 파일 (200MB) 업로드 테스트
@@ -458,6 +457,8 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - [x] 커스텀 예외 클래스 작성
   - [x] EvtxParsingException
   - [x] FileValidationException
+- [x] 에러 페이지 뷰 작성
+  - [x] 404, 500 템플릿 (TOSS 스타일)
   - [ ] DataNotFoundException 등
 - [ ] 에러 응답 DTO 표준화
   - [ ] ErrorResponse DTO
