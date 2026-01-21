@@ -1,0 +1,110 @@
+# Windows Event Log Analysis Web System - Cursor Rules
+
+## Project Overview
+Spring Boot 3.x + WebFlux based Windows EVTX log analysis web system
+
+## Tech Stack
+- **Backend**: Spring Boot 3.x, WebFlux, JPA, Redis, Spring AI
+- **Frontend**: Thymeleaf, Tailwind CSS (1-2 libraries only), Chart.js
+- **Database**: MariaDB
+- **Build**: Gradle
+- **Java**: 17+
+
+## Required Code Style and Conventions
+
+### 1. Java Coding Conventions
+- **Naming**: camelCase (variables, methods), PascalCase (classes), UPPER_SNAKE_CASE (constants)
+- **Package Structure**: 
+  ```
+  com.evlo.{domain}
+    - controller (WebFlux RouterFunction or @RestController)
+    - service (business logic)
+    - repository (JPA Repository)
+    - entity (JPA Entity)
+    - dto (Request/Response)
+    - config (configuration classes)
+    - exception (custom exceptions)
+    - parser (EVTX parser)
+  ```
+- **Class Structure**: Fields → Constructors → Methods order
+- **Access Modifiers**: Principle of least privilege (private > protected > public)
+
+### 2. Spring Boot / WebFlux Rules
+- **WebFlux Usage**: All Controllers must use RouterFunction or @RestController
+- **Reactive Types**: Use Mono<T>, Flux<T> (maintain Non-blocking)
+- **Blocking Processing Separation**: Blocking operations like EVTX parsing must use `boundedElastic()`
+- **@Transactional**: Use only in Service Layer, be cautious with JPA Batch processing
+
+### 3. JPA / Database Rules
+- **Entity**: Use @Entity, @Table(name = "..."), @Id, @GeneratedValue
+- **Repository**: Use Spring Data JPA Interface, use @Query or Specification for Custom Query
+- **Batch Processing**: 
+  - `spring.jpa.properties.hibernate.jdbc.batch_size: 1000`
+  - Call `EntityManager.flush()` and `clear()` every 500-1000 records
+- **Indexes**: Explicitly declare using @Index or @Table(indexes = {...})
+- **Enum Types**: Use @Enumerated(EnumType.STRING)
+
+### 4. Error Handling
+- **Global Exception Handling**: Use @ControllerAdvice
+- **Custom Exceptions**: Extend RuntimeException, include clear messages
+- **Error Response**: Use standardized ErrorResponse DTO
+- **Logging**: Log at ERROR level with stack trace when exceptions occur
+
+### 5. File Upload / EVTX Parsing
+- **Streaming Processing**: Use WebFlux DataBuffer, consider memory efficiency
+- **File Validation**: Required validation for extension (.evtx) and size (max 200MB)
+- **Progress Tracking**: Store progress in Redis, use file ID as key
+- **Exception Handling**: Return clear error messages when parsing fails
+
+### 6. Frontend (Thymeleaf)
+- **Library Minimization**: Use only Tailwind CSS (add Alpine.js if needed)
+- **Design**: Reference TOSS style (minimal, spacious margins, clear typography)
+- **Template Structure**: 
+  - `templates/layout/` - Layout templates
+  - `templates/fragments/` - Reusable components
+  - `templates/{page}/` - Page-specific templates
+- **Naming**: kebab-case (file names), camelCase (variable names)
+
+### 7. Testing
+- **Unit Tests**: Use JUnit 5, Mockito
+- **Integration Tests**: Use @SpringBootTest, WebTestClient (for WebFlux)
+- **Test Coverage**: Target 70% or higher
+- **Test Class Naming**: `{ClassName}Test` or `{ClassName}Tests`
+
+### 8. Configuration Files
+- **application.yml**: Separate by profile (application-dev.yml, application-prod.yml)
+- **Environment Variables**: Use environment variables for sensitive information
+- **Logging**: Use logback-spring.xml, profile-specific configuration
+
+### 9. Comments and Documentation
+- **JavaDoc**: Write only for Public API, keep it concise
+- **Comments**: Use only for complex logic, explain "why" (code should clearly show "what")
+- **TODO**: Remove temporary TODOs or convert to issues
+
+### 10. Performance and Memory
+- **Batch Processing**: Must use Batch Insert for large data
+- **Memory Management**: Manage Persistence Context with flush/clear
+- **Caching**: Cache frequently accessed data in Redis
+- **Streaming**: Use streaming processing for large files/data
+
+### 11. Security
+- **Input Validation**: Use Validation annotations like @Valid, @NotNull
+- **SQL Injection**: Use JPA, parameter binding required for Native Query
+- **File Upload**: Required validation for file size and extension
+- **Error Messages**: Do not expose internal system information
+
+### 12. Git Commits
+- **Commit Messages**: Clear and concise (e.g., "feat: implement EVTX parser", "fix: resolve Batch insert memory issue")
+- **Commit Unit**: Logically completed work unit
+
+## Prohibited Practices
+- ❌ Direct use of Blocking I/O in WebFlux (without boundedElastic())
+- ❌ Loading entire large datasets (without Batch processing)
+- ❌ Hardcoded configuration values (use application.yml)
+- ❌ Exceptions without global exception handling
+- ❌ Unnecessary dependency additions (follow 1-2 library principle)
+- ❌ Complex nested structures (avoid more than 3 levels)
+
+## Reference Documents
+- [TASK.md](./docs/TASK.md) - Development task list
+- [Architecture Document](./docs/windows_이벤트_로그_분석_웹_기능_정의서_아키텍처.md)

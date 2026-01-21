@@ -1,0 +1,32 @@
+# TASK.md 기반 커밋 메시지 템플릿
+# 
+# 변경사항 유형을 선택하세요:
+#   feat: 새로운 기능 추가
+#   fix: 버그 수정
+#   docs: 문서 수정
+#   style: 코드 포맷팅, 세미콜론 누락 등
+#   refactor: 코드 리팩토링
+#   test: 테스트 코드 추가/수정
+#   chore: 빌드 업무 수정, 패키지 매니저 설정 등
+#   perf: 성능 개선
+#
+# 작업 섹션 (TASK.md 기반):
+#   Week 1: 프로젝트 초기 설정 및 기본 기능
+#   Week 2: 검색/필터링 및 분석 기능
+#   Week 3: HTTPS 및 보안 설정
+#   Week 4: PQC Gateway (선택/실습)
+#   부가 작업: 에러 처리, 로깅, 테스트, Docker
+#
+# 아래는 자동으로 생성된 제안입니다. 필요시 수정하세요:
+
+<type>(<scope>): <subject>
+
+# Week <number>: <section>
+# 예: feat(parser): EVTX 파싱 서비스 구현
+#     fix(upload): 파일 크기 검증 로직 수정
+
+<body>
+
+# 관련 작업 목록 (TASK.md 참고):
+# - [ ] 작업 1
+# - [ ] 작업 2
