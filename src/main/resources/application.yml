@@ -5,6 +5,10 @@ spring:
   profiles:
     active: dev
 
+app:
+  upload:
+    temp-dir: ./temp/uploads
+
 ---
 spring:
   config:

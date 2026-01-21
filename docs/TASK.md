@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: EVTX 파서 PoC 기본 구현 완료 ✅
-- **다음 작업**: 단위 테스트 작성 및 파일 업로드 기능 구현
+- **Week 1**: 파일 업로드 기능 구현 완료 ✅
+- **다음 작업**: 스트리밍 처리 및 Batch 저장 최적화
 
 ---
 
@@ -132,19 +132,24 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - 샘플 EVTX 파일 준비 필요
 
 ### 2.4 파일 업로드 기능
-- [ ] WebFlux MultipartFile 업로드 API 구현
-  - [ ] POST /api/upload 엔드포인트
-  - [ ] 다중 파일 업로드 지원
-  - [ ] Mono<ServerResponse> 반환
-- [ ] 파일 크기 제한 설정 (200MB)
-  - [ ] application.yml에 설정
-  - [ ] 업로드 시 파일 크기 검증
-- [ ] 파일 검증 (EVTX 확장자 체크)
-  - [ ] 파일 확장자 검증 로직
-  - [ ] 잘못된 파일 형식 에러 처리
-- [ ] 임시 저장 처리
-  - [ ] 업로드된 파일 임시 저장 경로 설정
-  - [ ] 파일 처리 완료 후 삭제 정책
+- [x] WebFlux MultipartFile 업로드 API 구현
+  - [x] POST /api/upload 엔드포인트
+  - [x] POST /api/upload/multiple (다중 파일 업로드 지원)
+  - [x] Mono<ResponseEntity> 반환 (boundedElastic() 사용)
+- [x] 파일 크기 제한 설정 (200MB)
+  - [x] application.yml에 설정 (완료)
+  - [x] 업로드 시 파일 크기 검증
+- [x] 파일 검증 (EVTX 확장자 체크)
+  - [x] 파일 확장자 검증 로직
+  - [x] 잘못된 파일 형식 에러 처리 (FileValidationException)
+- [x] 임시 저장 처리
+  - [x] 업로드된 파일 임시 저장 경로 설정 (app.upload.temp-dir)
+  - [x] 파일 처리 완료 후 삭제 정책 (finally 블록에서 삭제)
+
+**다음 작업 정보:**
+- 스트리밍 처리 및 Batch 저장 최적화 필요
+- 진행률 추적 기능 (Redis 활용) 구현 필요
+- 파일 업로드 UI 구현 필요
 
 ### 2.5 스트리밍 처리 및 Batch 저장
 - [ ] WebFlux 스트리밍 업로드 처리
