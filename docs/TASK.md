@@ -6,8 +6,8 @@
 - **[ ] 예정**: 작업 예정
 
 ### 현재 진행 상황
-- **Week 1**: 파일 업로드 기능 구현 완료 ✅
-- **다음 작업**: 스트리밍 처리 및 Batch 저장 최적화
+- **Week 1**: 스트리밍 처리 및 Batch 저장 최적화 완료 ✅
+- **다음 작업**: 기본 UI 구현 (Thymeleaf, Tailwind CSS)
 
 ---
 
@@ -152,19 +152,24 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - 파일 업로드 UI 구현 필요
 
 ### 2.5 스트리밍 처리 및 Batch 저장
-- [ ] WebFlux 스트리밍 업로드 처리
-  - [ ] DataBuffer를 이용한 스트리밍
-  - [ ] 메모리 효율적인 파일 처리
-- [ ] EVTX 파싱 스트리밍 구현
-  - [ ] 대용량 파일 스트리밍 파싱
-  - [ ] 진행률 Redis 저장
-- [ ] JPA batch insert 구현
-  - [ ] 500-1000건마다 flush/clear 로직
-  - [ ] EntityManager 사용 (Service Layer)
-  - [ ] @Transactional 설정
-- [ ] boundedElastic()로 Blocking 처리 분리
-  - [ ] EVTX 파싱을 별도 스레드풀에서 실행
-  - [ ] Non-blocking 유지
+- [x] WebFlux 스트리밍 업로드 처리
+  - [x] Mono 기반 Non-blocking 처리
+  - [x] 메모리 효율적인 파일 처리 (임시 파일 사용)
+- [x] EVTX 파싱 스트리밍 구현
+  - [x] 대용량 파일 스트리밍 파싱 (EvtxParserService)
+  - [x] 진행률 Redis 저장 (100건마다 또는 배치 크기마다)
+- [x] JPA batch insert 구현
+  - [x] 500-1000건마다 flush/clear 로직 (설정 가능)
+  - [x] EntityManager 사용 (Service Layer)
+  - [x] @Transactional 설정
+- [x] boundedElastic()로 Blocking 처리 분리
+  - [x] EVTX 파싱을 별도 스레드풀에서 실행 (processFileAsync)
+  - [x] Controller에서 Non-blocking 유지
+
+**다음 작업 정보:**
+- 기본 UI 구현 필요 (Thymeleaf, Tailwind CSS)
+- 로그 업로드 페이지 구현
+- 진행률 표시 UI 구현 (프론트엔드)
 
 ### 2.6 기본 UI (Thymeleaf)
 - [ ] Tailwind CSS 설정 (또는 Alpine.js)

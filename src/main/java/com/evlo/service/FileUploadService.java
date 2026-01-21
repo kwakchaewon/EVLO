@@ -1,5 +1,6 @@
 package com.evlo.service;
 
+import com.evlo.entity.Event;
 import com.evlo.entity.LogFile;
 import com.evlo.entity.enums.ParsingStatus;
 import com.evlo.exception.FileValidationException;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,12 +38,16 @@ public class FileUploadService {
     private final LogFileRepository logFileRepository;
     private final EventRepository eventRepository;
     private final EvtxParserService evtxParserService;
+    private final ProgressTrackingService progressTrackingService;
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Value("${app.upload.temp-dir:./temp/uploads}")
     private String tempUploadDir;
+
+    @Value("${app.batch.size:1000}")
+    private int batchSize;
 
     /**
      * 파일 검증 (확장자, 크기)
@@ -96,26 +102,12 @@ public class FileUploadService {
             tempFile = new File(tempDir.toFile(), logFile.getId() + "_" + filename);
             multipartFile.transferTo(tempFile);
 
-            // EVTX 파일 파싱
-            List<com.evlo.entity.Event> events = evtxParserService.parseEvtxFile(tempFile, logFile);
+            // 파일 메타정보 Redis 저장
+            progressTrackingService.saveFileMeta(logFile.getId(), filename, fileSize)
+                    .subscribe();
 
-            // Batch Insert (500-1000건마다 flush/clear)
-            int batchSize = 1000;
-            for (int i = 0; i < events.size(); i++) {
-                entityManager.persist(events.get(i));
-
-                if ((i + 1) % batchSize == 0) {
-                    entityManager.flush();
-                    entityManager.clear();
-                    log.debug("Flushed {} events", i + 1);
-                }
-            }
-
-            // 남은 이벤트 처리
-            if (events.size() % batchSize != 0) {
-                entityManager.flush();
-                entityManager.clear();
-            }
+            // EVTX 파일 스트리밍 파싱 및 배치 저장
+            processEvtxFileWithProgress(tempFile, logFile);
 
             // 파싱 상태 업데이트
             logFile.setParsingStatus(ParsingStatus.COMPLETED);
@@ -144,5 +136,53 @@ public class FileUploadService {
                 }
             }
         }
+    }
+
+    /**
+     * EVTX 파일 스트리밍 파싱 및 진행률 추적
+     */
+    private void processEvtxFileWithProgress(File tempFile, LogFile logFile) {
+        List<Event> events = evtxParserService.parseEvtxFile(tempFile, logFile);
+        int totalCount = events.size();
+
+        // 초기 진행률 저장
+        progressTrackingService.saveProgress(logFile.getId(), 0, totalCount)
+                .subscribe();
+
+        // Batch Insert with Progress Tracking
+        for (int i = 0; i < events.size(); i++) {
+            entityManager.persist(events.get(i));
+
+            // 진행률 업데이트 (100건마다 또는 배치 크기마다)
+            if ((i + 1) % 100 == 0 || (i + 1) % batchSize == 0) {
+                progressTrackingService.saveProgress(logFile.getId(), i + 1, totalCount)
+                        .subscribe();
+            }
+
+            // 배치 크기마다 flush/clear
+            if ((i + 1) % batchSize == 0) {
+                entityManager.flush();
+                entityManager.clear();
+                log.debug("Flushed {} events ({}%)", i + 1, (i + 1) * 100.0 / totalCount);
+            }
+        }
+
+        // 남은 이벤트 처리
+        if (events.size() % batchSize != 0) {
+            entityManager.flush();
+            entityManager.clear();
+        }
+
+        // 완료 진행률 저장
+        progressTrackingService.saveProgress(logFile.getId(), totalCount, totalCount)
+                .subscribe();
+    }
+
+    /**
+     * Non-blocking 파일 처리 (Reactive)
+     */
+    public Mono<LogFile> processFileAsync(MultipartFile multipartFile) {
+        return Mono.fromCallable(() -> processFile(multipartFile))
+                .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 }

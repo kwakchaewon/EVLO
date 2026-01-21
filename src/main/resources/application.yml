@@ -8,6 +8,8 @@ spring:
 app:
   upload:
     temp-dir: ./temp/uploads
+  batch:
+    size: 1000
 
 ---
 spring:
