@@ -64,6 +64,10 @@ Windows 시스템에서 추출한 **EVTX 로그 파일**을 웹에서 업로드�
 - Enum 타입: EventLevel (Information/Warning/Error/Critical), LogChannel (System/Application/Security/Setup/ForwardedEvents)
 
 ### 2.2 데이터베이스 설계
+- [x] Flyway 데이터베이스 마이그레이션 도구 설정
+  - [x] Flyway 의존성 추가
+  - [x] Flyway 기본 설정 (application.yml)
+  - [x] 마이그레이션 스크립트 디렉토리 구조 준비 (src/main/resources/db/migration)
 - [ ] Event 엔티티 설계
   - [ ] 필드 정의 (EventID, Level, TimeCreated, Provider, Computer, Message 등)
   - [ ] 인덱스 설계 (TimeCreated, EventID, Level)
