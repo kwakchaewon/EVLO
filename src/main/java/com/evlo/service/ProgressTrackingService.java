@@ -63,7 +63,12 @@ public class ProgressTrackingService {
         String value = String.format("%s|%d", filename, fileSize);
         
         return redisTemplate.opsForValue()
-                .set(key, value, TTL);
+                .set(key, value, TTL)
+                .doOnSuccess(saved -> {
+                    if (saved) {
+                        log.debug("Saved file meta to cache: {} -> {}", fileId, filename);
+                    }
+                });
     }
 
     /**

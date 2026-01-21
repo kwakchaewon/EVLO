@@ -41,6 +41,9 @@ dependencies {
     // Spring Boot Data Redis Reactive
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     
+    // Jackson for JSON serialization
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
     // Spring AI (OpenAI)
     implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:0.8.1'
     

@@ -5,6 +5,7 @@ import com.evlo.entity.Event;
 import com.evlo.entity.enums.EventLevel;
 import com.evlo.entity.enums.LogChannel;
 import com.evlo.repository.EventRepository;
+import com.evlo.service.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class EventController {
 
     private final EventRepository eventRepository;
+    private final CacheService cacheService;
 
     /**
      * 홈 페이지
@@ -88,7 +91,7 @@ public class EventController {
 
         Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
 
-        // 검색 실행
+        // 검색 실행 (캐시 조회는 우선 DB 조회 후 캐시 저장 방식)
         Page<Event> eventPage;
         if (hasFilters(searchRequest)) {
             // 필터가 있는 경우 복합 검색
@@ -108,6 +111,14 @@ public class EventController {
             // 필터 없이 전체 조회
             eventPage = eventRepository.findAll(pageable);
         }
+
+        // 캐시 저장 (비동기로 처리)
+        cacheService.cacheSearchResult(searchRequest, pageable, eventPage)
+                .subscribe();
+        
+        // 검색 카운트 증가 (통계용)
+        cacheService.incrementSearchCount(searchRequest)
+                .subscribe();
 
         // 모델에 데이터 추가
         model.addAttribute("events", eventPage.getContent());
