@@ -1,13 +1,13 @@
--- 파싱된 이벤트 로그 (log_files 1:N)
-CREATE TABLE events (
+-- 파싱된 이벤트 로그 (log_files 1:N) (이미 있으면 스킵)
+CREATE TABLE IF NOT EXISTS events (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     event_id BIGINT NOT NULL,
-    level VARCHAR(20) NOT NULL,
+    level ENUM('INFORMATION','WARNING','ERROR','CRITICAL') NOT NULL,
     time_created DATETIME(6) NOT NULL,
     provider VARCHAR(500),
     computer VARCHAR(255),
     message TEXT,
-    channel VARCHAR(50) NOT NULL,
+    channel ENUM('SYSTEM','APPLICATION','SECURITY','SETUP','FORWARDED_EVENTS') NOT NULL,
     log_file_id BIGINT NOT NULL,
     created_at DATETIME(6) NOT NULL,
     CONSTRAINT fk_events_log_file FOREIGN KEY (log_file_id) REFERENCES log_files(id) ON DELETE CASCADE,

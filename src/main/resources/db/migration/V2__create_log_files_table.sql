@@ -1,9 +1,9 @@
--- 업로드된 EVTX 파일 메타정보
-CREATE TABLE log_files (
+-- 업로드된 EVTX 파일 메타정보 (이미 있으면 스킵)
+CREATE TABLE IF NOT EXISTS log_files (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     filename VARCHAR(500) NOT NULL,
     file_size BIGINT NOT NULL,
-    parsing_status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+    parsing_status ENUM('IN_PROGRESS','COMPLETED','FAILED') NOT NULL DEFAULT 'IN_PROGRESS',
     uploaded_at DATETIME(6) NOT NULL,
     created_at DATETIME(6) NOT NULL,
     INDEX idx_log_files_parsing_status (parsing_status),
