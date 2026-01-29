@@ -7,6 +7,8 @@
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN (분석 페이지 등에서 사용) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     <!-- TOSS 스타일 기본 설정 -->
     <script>
@@ -70,7 +72,7 @@
     <!-- 메인 컨텐츠 -->
     <main class="min-h-screen">
         <div class="container-toss py-8">
-            <div th:replace="~{::content}">Content goes here</div>
+            <div th:replace="~{${contentTemplate} :: ${contentFragment}}">Content goes here</div>
         </div>
     </main>
 

@@ -35,24 +35,33 @@ public class EventController {
      * 홈 페이지
      */
     @GetMapping("/")
-    public String index() {
-        return "index";
+    public String index(Model model) {
+        model.addAttribute("title", "EVLO - Windows 이벤트 로그 분석");
+        model.addAttribute("contentTemplate", "index");
+        model.addAttribute("contentFragment", "content");
+        return "layout/base";
     }
 
     /**
      * 로그 업로드 페이지
      */
     @GetMapping("/upload")
-    public String uploadPage() {
-        return "upload";
+    public String uploadPage(Model model) {
+        model.addAttribute("title", "로그 업로드 - EVLO");
+        model.addAttribute("contentTemplate", "upload");
+        model.addAttribute("contentFragment", "content");
+        return "layout/base";
     }
 
     /**
      * 분석 페이지
      */
     @GetMapping("/analysis")
-    public String analysisPage() {
-        return "analysis";
+    public String analysisPage(Model model) {
+        model.addAttribute("title", "분석 - EVLO");
+        model.addAttribute("contentTemplate", "analysis");
+        model.addAttribute("contentFragment", "content");
+        return "layout/base";
     }
 
     /**
@@ -129,6 +138,9 @@ public class EventController {
                 .subscribe();
 
         // 모델에 데이터 추가
+        model.addAttribute("title", "이벤트 조회 - EVLO");
+        model.addAttribute("contentTemplate", "events");
+        model.addAttribute("contentFragment", "content");
         model.addAttribute("events", eventPage.getContent());
         model.addAttribute("currentPage", eventPage.getNumber());
         model.addAttribute("totalPages", eventPage.getTotalPages());
@@ -142,7 +154,7 @@ public class EventController {
         model.addAttribute("allLevels", EventLevel.values());
         model.addAttribute("allChannels", LogChannel.values());
 
-        return "events";
+        return "layout/base";
     }
 
     /**

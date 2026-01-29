@@ -73,6 +73,7 @@ dependencies {
 
     // ANTLR: Hibernate HQL 파서와 버전 맞춤 (4.13.1이면 경고 발생)
     implementation 'org.antlr:antlr4-runtime:4.10.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Lombok (optional but recommended)
     compileOnly 'org.projectlombok:lombok'
