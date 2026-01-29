@@ -10,6 +10,7 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -40,6 +41,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, ServerWebExchange exchange) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange);
+    }
+
+    /**
+     * 파일 업로드 등에서 Content-Type이 multipart/form-data가 아닐 때 발생.
+     * 지원하지 않는 파일/미디어 타입으로 통일된 메시지 반환.
+     */
+    @ExceptionHandler(UnsupportedMediaTypeStatusException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedMediaType(UnsupportedMediaTypeStatusException ex, ServerWebExchange exchange) {
+        log.debug("Unsupported media type: {} -> {}", exchange.getRequest().getPath(), ex.getReason());
+        return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 파일 형식입니다.", exchange);
     }
 
     @ExceptionHandler(Exception.class)

@@ -142,8 +142,13 @@
                         body: formData
                     });
 
-                    const results = await response.json();
-                    displayResults(results);
+                    const data = await response.json();
+                    if (!response.ok) {
+                        const message = data.message || (response.status === 415 ? '지원하지 않는 파일 형식입니다.' : '업로드 중 오류가 발생했습니다.');
+                        alert(message);
+                        return;
+                    }
+                    displayResults(Array.isArray(data) ? data : [data]);
                 } catch (error) {
                     console.error('Upload error:', error);
                     alert('업로드 중 오류가 발생했습니다.');
