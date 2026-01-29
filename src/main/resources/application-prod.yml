@@ -1,4 +1,9 @@
 # Production profile specific settings
+# Docker/K8s: evtx.service.url=http://evtx-service:8081
+evtx:
+  service:
+    url: ${EVTX_SERVICE_URL:http://evtx-service:8081}
+
 spring:
   jpa:
     show-sql: false

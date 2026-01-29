@@ -11,6 +11,20 @@ app:
   batch:
     size: 1000
 
+# EVTX 파서 서비스 (evtx-service)
+evtx:
+  service:
+    url: http://localhost:8081
+    timeoutMs: 30000
+    retry:
+      maxAttempts: 3
+      waitDuration: 1000
+    circuitBreaker:
+      enabled: true
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10000
+      slidingWindowSize: 10
+
 spring:
   ai:
     openai:

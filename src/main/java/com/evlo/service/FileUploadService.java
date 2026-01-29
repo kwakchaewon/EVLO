@@ -107,13 +107,13 @@ public class FileUploadService {
                     .subscribe();
 
             // EVTX 파일 스트리밍 파싱 및 배치 저장
-            processEvtxFileWithProgress(tempFile, logFile);
+            int eventCount = processEvtxFileWithProgress(tempFile, logFile);
 
             // 파싱 상태 업데이트
             logFile.setParsingStatus(ParsingStatus.COMPLETED);
             logFileRepository.save(logFile);
 
-            log.info("File processed successfully: {} ({} events)", filename, events.size());
+            log.info("File processed successfully: {} ({} events)", filename, eventCount);
             return logFile;
 
         } catch (EvtxParsingException e) {
@@ -140,8 +140,9 @@ public class FileUploadService {
 
     /**
      * EVTX 파일 스트리밍 파싱 및 진행률 추적
+     * @return 저장된 이벤트 수
      */
-    private void processEvtxFileWithProgress(File tempFile, LogFile logFile) {
+    private int processEvtxFileWithProgress(File tempFile, LogFile logFile) {
         List<Event> events = evtxParserService.parseEvtxFile(tempFile, logFile);
         int totalCount = events.size();
 
@@ -176,6 +177,8 @@ public class FileUploadService {
         // 완료 진행률 저장
         progressTrackingService.saveProgress(logFile.getId(), totalCount, totalCount)
                 .subscribe();
+
+        return totalCount;
     }
 
     /**

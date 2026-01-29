@@ -19,6 +19,14 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.ai:spring-ai-bom:0.8.1"
+    }
 }
 
 dependencies {
@@ -50,9 +58,8 @@ dependencies {
     // PDF Library (OpenPDF)
     implementation 'com.github.librepdf:openpdf:1.3.30'
     
-    // EVTX Parser
-    implementation 'com.github.palindromicity:simple-evtx:2.2.0'
-    
+    // EVTX 파싱: evtx-service (python-evtx) REST API 연동으로 처리
+
     // Lombok (optional but recommended)
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
