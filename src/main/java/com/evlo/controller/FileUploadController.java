@@ -32,18 +32,8 @@ public class FileUploadController {
             @RequestPart("file") MultipartFile file) {
 
         // boundedElastic()로 Blocking 작업 분리
-        return fileUploadService.processFileAsync(file)
+        Mono<ResponseEntity<FileUploadResponse>> mono = fileUploadService.processFileAsync(file)
                 .map(logFile -> {
-            try {
-                LogFile logFile = fileUploadService.processFile(file);
-                FileUploadResponse response = FileUploadResponse.builder()
-                        .fileId(logFile.getId())
-                        .filename(logFile.getFilename())
-                        .fileSize(logFile.getFileSize())
-                        .status(logFile.getParsingStatus().name())
-                        .message("File uploaded and parsed successfully")
-                        .build();
-
                     FileUploadResponse response = FileUploadResponse.builder()
                             .fileId(logFile.getId())
                             .filename(logFile.getFilename())
@@ -51,25 +41,28 @@ public class FileUploadController {
                             .status(logFile.getParsingStatus().name())
                             .message("File uploaded and parsed successfully")
                             .build();
-
                     return ResponseEntity.ok(response);
-                })
-                .onErrorResume(FileValidationException.class, e -> {
-                    log.error("File validation error: {}", e.getMessage());
-                    FileUploadResponse response = FileUploadResponse.builder()
-                            .status("FAILED")
-                            .message(e.getMessage())
-                            .build();
-                    return Mono.just(ResponseEntity.badRequest().body(response));
-                })
-                .onErrorResume(Exception.class, e -> {
-                    log.error("Error uploading file: {}", e.getMessage(), e);
-                    FileUploadResponse response = FileUploadResponse.builder()
-                            .status("FAILED")
-                            .message("Internal server error: " + e.getMessage())
-                            .build();
-                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
                 });
+
+        mono = mono.onErrorResume(FileValidationException.class, e -> {
+            log.error("File validation error: {}", e.getMessage());
+            FileUploadResponse response = FileUploadResponse.builder()
+                    .status("FAILED")
+                    .message(e.getMessage())
+                    .build();
+            return Mono.just(ResponseEntity.badRequest().body(response));
+        });
+
+        mono = mono.onErrorResume(Exception.class, e -> {
+            log.error("Error uploading file: {}", e.getMessage(), e);
+            FileUploadResponse response = FileUploadResponse.builder()
+                    .status("FAILED")
+                    .message("Internal server error: " + e.getMessage())
+                    .build();
+            return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
+        });
+
+        return mono;
     }
 
     /**

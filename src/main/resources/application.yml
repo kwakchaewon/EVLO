@@ -1,9 +1,15 @@
 spring:
   application:
     name: evlo
-  
   profiles:
     active: dev
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: gpt-3.5-turbo
+          temperature: 0.7
 
 app:
   upload:
@@ -24,15 +30,6 @@ evtx:
       failureRateThreshold: 50
       waitDurationInOpenState: 10000
       slidingWindowSize: 10
-
-spring:
-  ai:
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      chat:
-        options:
-          model: gpt-3.5-turbo
-          temperature: 0.7
 
 ---
 spring:

@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,9 +70,9 @@ public class EvtxParserService {
                             .doBeforeRetry(s -> log.warn("Evtx-service call failed, retrying: {}", s.failure().getMessage()))
                     )
                     .map(EvtxParseResponse::getEvents)
-                    .map(list -> list != null ? list : Collections.emptyList())
+                    .map(list -> list != null ? list : List.<EvtxEventDto>of())
                     .blockOptional()
-                    .orElse(Collections.emptyList());
+                    .orElseGet(() -> List.<EvtxEventDto>of());
 
             return dtos.stream()
                     .map(dto -> convertToEvent(dto, logFile))
@@ -107,9 +106,9 @@ public class EvtxParserService {
                     .bodyToMono(EvtxParseResponse.class)
                     .timeout(Duration.ofMillis(props.getTimeoutMs()))
                     .map(EvtxParseResponse::getEvents)
-                    .map(list -> list != null ? list : Collections.emptyList())
+                    .map(list -> list != null ? list : List.<EvtxEventDto>of())
                     .blockOptional()
-                    .orElse(Collections.emptyList());
+                    .orElseGet(() -> List.<EvtxEventDto>of());
 
             return dtos.stream()
                     .map(dto -> convertToEvent(dto, logFile))

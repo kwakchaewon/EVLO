@@ -142,7 +142,7 @@ public class FileUploadService {
      * EVTX 파일 스트리밍 파싱 및 진행률 추적
      * @return 저장된 이벤트 수
      */
-    private int processEvtxFileWithProgress(File tempFile, LogFile logFile) {
+    private int processEvtxFileWithProgress(File tempFile, LogFile logFile) throws IOException {
         List<Event> events = evtxParserService.parseEvtxFile(tempFile, logFile);
         int totalCount = events.size();
 

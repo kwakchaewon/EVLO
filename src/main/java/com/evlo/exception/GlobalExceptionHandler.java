@@ -1,6 +1,7 @@
 package com.evlo.exception;
 
 import com.evlo.dto.ErrorResponse;
+import com.evlo.parser.EvtxParsingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
