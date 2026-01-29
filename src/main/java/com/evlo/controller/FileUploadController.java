@@ -2,6 +2,7 @@ package com.evlo.controller;
 
 import com.evlo.dto.FileUploadResponse;
 import com.evlo.entity.LogFile;
+import com.evlo.exception.EvtxServiceUnavailableException;
 import com.evlo.exception.FileValidationException;
 import com.evlo.service.FileUploadService;
 import com.evlo.support.InMemoryMultipartFile;
@@ -83,6 +84,14 @@ public class FileUploadController {
             return Mono.just(ResponseEntity.badRequest().body(response));
         });
 
+        mono = mono.onErrorResume(EvtxServiceUnavailableException.class, e -> {
+            FileUploadResponse response = FileUploadResponse.builder()
+                    .status("FAILED")
+                    .message("EVTX 파서 서비스를 사용할 수 없습니다. 관리자에게 문의해 주세요.")
+                    .build();
+            return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response));
+        });
+
         mono = mono.onErrorResume(Exception.class, e -> {
             log.error("Error uploading file: {}", e.getMessage(), e);
             FileUploadResponse response = FileUploadResponse.builder()
@@ -128,6 +137,14 @@ public class FileUploadController {
                                     .fileSize(file.getSize())
                                     .status("FAILED")
                                     .message(e.getMessage())
+                                    .build());
+                        } catch (EvtxServiceUnavailableException e) {
+                            log.warn("Evtx-service unavailable for {}: {}", file.getOriginalFilename(), e.getMessage());
+                            responses.add(FileUploadResponse.builder()
+                                    .filename(file.getOriginalFilename())
+                                    .fileSize(file.getSize())
+                                    .status("FAILED")
+                                    .message("EVTX 파서 서비스를 사용할 수 없습니다. 관리자에게 문의해 주세요.")
                                     .build());
                         } catch (Exception e) {
                             log.error("Error uploading file {}: {}", file.getOriginalFilename(), e.getMessage(), e);

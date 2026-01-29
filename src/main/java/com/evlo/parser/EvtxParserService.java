@@ -2,6 +2,7 @@ package com.evlo.parser;
 
 import com.evlo.config.EvtxServiceProperties;
 import com.evlo.dto.evtx.EvtxEventDto;
+import com.evlo.exception.EvtxServiceUnavailableException;
 import com.evlo.dto.evtx.EvtxParseResponse;
 import com.evlo.entity.Event;
 import com.evlo.entity.LogFile;
@@ -21,6 +22,7 @@ import reactor.util.retry.Retry;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -85,6 +87,10 @@ public class EvtxParserService {
             if (e.getCause() instanceof EvtxParsingException) {
                 throw (EvtxParsingException) e.getCause();
             }
+            if (isServiceUnavailable(e)) {
+                log.warn("Evtx-service unavailable: {}", e.getMessage());
+                throw new EvtxServiceUnavailableException("EVTX 파서 서비스를 사용할 수 없습니다.", e);
+            }
             log.error("Evtx parsing failed", e);
             throw new EvtxParsingException("Evtx parsing failed: " + e.getMessage(), e);
         }
@@ -117,7 +123,27 @@ public class EvtxParserService {
             log.error("Evtx-service error: {} {}", e.getStatusCode(), e.getResponseBodyAsString());
             throw new EvtxParsingException(
                     "Evtx-service failed: " + e.getStatusCode() + " " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            if (isServiceUnavailable(e)) {
+                log.warn("Evtx-service unavailable: {}", e.getMessage());
+                throw new EvtxServiceUnavailableException("EVTX 파서 서비스를 사용할 수 없습니다.", e);
+            }
+            throw new EvtxParsingException("Evtx parsing failed: " + e.getMessage(), e);
         }
+    }
+
+    /** 연결 거부, 타임아웃, 재시도 소진 등 외부 서비스 미사용 가능 상태인지 판별 */
+    private static boolean isServiceUnavailable(Throwable t) {
+        Throwable current = t;
+        while (current != null) {
+            if (current instanceof ConnectException) return true;
+            if (current.getClass().getName().contains("RetryExhaustedException")) return true;
+            if (current instanceof org.springframework.web.reactive.function.client.WebClientRequestException) return true;
+            String msg = current.getMessage();
+            if (msg != null && (msg.contains("Connection refused") || msg.contains("connection refused"))) return true;
+            current = current.getCause();
+        }
+        return false;
     }
 
     private static boolean isRetryable(Throwable t) {
