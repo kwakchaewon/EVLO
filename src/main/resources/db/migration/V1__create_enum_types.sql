@@ -1,2 +1,2 @@
--- Enum 타입은 MariaDB에서 ENUM 타입으로 정의하거나 VARCHAR로 저장
--- JPA에서 @Enumerated(EnumType.STRING)을 사용하므로 VARCHAR로 저장
+-- EVLO 스키마 초기화
+-- Enum은 JPA @Enumerated(EnumType.STRING)으로 VARCHAR 컬럼에 저장 (별도 ENUM 타입 미사용)

@@ -39,8 +39,8 @@ spring:
   
   datasource:
     url: jdbc:mariadb://localhost:3306/evlo?useUnicode=true&characterEncoding=utf8
-    username: evlo_user
-    password: evlo_password
+    username: root
+    password: root
     driver-class-name: org.mariadb.jdbc.Driver
   
   data:
