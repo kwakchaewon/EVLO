@@ -15,6 +15,11 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    all {
+        resolutionStrategy {
+            force 'org.antlr:antlr4-runtime:4.10.1'
+        }
+    }
 }
 
 repositories {
@@ -26,6 +31,9 @@ repositories {
 dependencyManagement {
     imports {
         mavenBom "org.springframework.ai:spring-ai-bom:0.8.1"
+    }
+    dependencies {
+        dependency 'org.antlr:antlr4-runtime:4.10.1'
     }
 }
 
@@ -62,6 +70,9 @@ dependencies {
     implementation 'com.github.librepdf:openpdf:1.3.30'
     
     // EVTX 파싱: evtx-service (python-evtx) REST API 연동으로 처리
+
+    // ANTLR: Hibernate HQL 파서와 버전 맞춤 (4.13.1이면 경고 발생)
+    implementation 'org.antlr:antlr4-runtime:4.10.1'
 
     // Lombok (optional but recommended)
     compileOnly 'org.projectlombok:lombok'
