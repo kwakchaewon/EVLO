@@ -61,7 +61,7 @@
                     <div class="hidden md:flex space-x-6">
                         <a th:href="@{/}" class="text-gray-700 hover:text-toss-blue transition">홈</a>
                         <a th:href="@{/upload}" class="text-gray-700 hover:text-toss-blue transition">로그 업로드</a>
-                        <a th:href="@{/events}" class="text-gray-700 hover:text-toss-blue transition">이벤트 조회·분석</a>
+                        <a th:if="${showEventsNav != false}" th:href="@{/events}" class="text-gray-700 hover:text-toss-blue transition">이벤트 조회·분석</a>
                     </div>
                 </div>
             </div>

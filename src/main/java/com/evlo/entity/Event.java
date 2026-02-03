@@ -2,6 +2,7 @@ package com.evlo.entity;
 
 import com.evlo.entity.enums.EventLevel;
 import com.evlo.entity.enums.LogChannel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,6 +51,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "log_file_id", nullable = false)
+    @JsonIgnore
     private LogFile logFile;
 
     @Column(nullable = false, updatable = false)

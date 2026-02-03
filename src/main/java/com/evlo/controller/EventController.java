@@ -38,6 +38,7 @@ public class EventController {
         model.addAttribute("title", "EVLO - Windows 이벤트 로그 분석");
         model.addAttribute("contentTemplate", "index");
         model.addAttribute("contentFragment", "content");
+        model.addAttribute("showEventsNav", false);
         return "layout/base";
     }
 
