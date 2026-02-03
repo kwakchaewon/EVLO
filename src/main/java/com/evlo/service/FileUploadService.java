@@ -72,10 +72,10 @@ public class FileUploadService {
     }
 
     /**
-     * 파일 업로드 및 파싱 처리
+     * 파일 업로드 및 파싱 처리 (비회원 세션 구분용 sessionId)
      */
     @Transactional
-    public LogFile processFile(MultipartFile multipartFile) {
+    public LogFile processFile(MultipartFile multipartFile, String sessionId) {
         // 파일 검증
         validateFile(multipartFile);
 
@@ -88,6 +88,7 @@ public class FileUploadService {
                 .fileSize(fileSize)
                 .parsingStatus(ParsingStatus.IN_PROGRESS)
                 .uploadedAt(LocalDateTime.now())
+                .sessionId(sessionId)
                 .build();
 
         logFile = logFileRepository.save(logFile);
@@ -184,8 +185,8 @@ public class FileUploadService {
     /**
      * Non-blocking 파일 처리 (Reactive)
      */
-    public Mono<LogFile> processFileAsync(MultipartFile multipartFile) {
-        return Mono.fromCallable(() -> processFile(multipartFile))
+    public Mono<LogFile> processFileAsync(MultipartFile multipartFile, String sessionId) {
+        return Mono.fromCallable(() -> processFile(multipartFile, sessionId))
                 .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 }

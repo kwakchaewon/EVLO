@@ -15,11 +15,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -34,6 +37,23 @@ public class FileUploadController {
      * WebFlux에서 EVTX 등 바이너리 업로드 시 part Content-Type이 octet-stream이라
      * MultipartFile[]로 직접 바인딩되지 않으므로 FilePart로 받아 변환.
      */
+    private static final String SESSION_COOKIE_NAME = "EVLO_SESSION";
+
+    /** 쿠키에서 세션 ID 조회, 없으면 새로 생성해 응답에 쿠키로 담아 반환 */
+    private static String getOrCreateSessionId(ServerWebExchange exchange) {
+        var cookies = exchange.getRequest().getCookies().getFirst(SESSION_COOKIE_NAME);
+        if (cookies != null && cookies.getValue() != null && !cookies.getValue().isBlank()) {
+            return cookies.getValue();
+        }
+        String sessionId = UUID.randomUUID().toString();
+        exchange.getResponse().addCookie(
+                org.springframework.http.ResponseCookie.from(SESSION_COOKIE_NAME, sessionId)
+                        .maxAge(Duration.ofDays(7))
+                        .path("/")
+                        .build());
+        return sessionId;
+    }
+
     private static Mono<InMemoryMultipartFile> filePartToMultipartFile(FilePart part) {
         return DataBufferUtils.join(part.content())
                 .map(dataBuffer -> {
@@ -54,14 +74,17 @@ public class FileUploadController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<FileUploadResponse>> uploadFile(
+            ServerWebExchange exchange,
             @RequestBody reactor.core.publisher.Flux<Part> parts) {
+
+        String sessionId = getOrCreateSessionId(exchange);
 
         Mono<ResponseEntity<FileUploadResponse>> mono = parts
                 .filter(p -> "file".equals(p.name()) && p instanceof FilePart)
                 .cast(FilePart.class)
                 .next()
                 .flatMap(FileUploadController::filePartToMultipartFile)
-                .flatMap(file -> fileUploadService.processFileAsync(file)
+                .flatMap(file -> fileUploadService.processFileAsync(file, sessionId)
                         .map(logFile -> {
                             FileUploadResponse response = FileUploadResponse.builder()
                                     .fileId(logFile.getId())
@@ -109,7 +132,10 @@ public class FileUploadController {
      */
     @PostMapping(value = "/multiple", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<List<FileUploadResponse>>> uploadMultipleFiles(
+            ServerWebExchange exchange,
             @RequestBody reactor.core.publisher.Flux<Part> parts) {
+
+        String sessionId = getOrCreateSessionId(exchange);
 
         Mono<List<InMemoryMultipartFile>> filesMono = parts
                 .filter(p -> "files".equals(p.name()) && p instanceof FilePart)
@@ -122,7 +148,7 @@ public class FileUploadController {
                     List<FileUploadResponse> responses = new ArrayList<>();
                     for (InMemoryMultipartFile file : files) {
                         try {
-                            LogFile logFile = fileUploadService.processFile(file);
+                            LogFile logFile = fileUploadService.processFile(file, sessionId);
                             responses.add(FileUploadResponse.builder()
                                     .fileId(logFile.getId())
                                     .filename(logFile.getFilename())

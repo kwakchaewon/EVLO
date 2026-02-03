@@ -32,14 +32,17 @@ public class CacheService {
     private final ObjectMapper objectMapper;
 
     /**
-     * 검색 조건을 캐시 키로 변환
+     * 검색 조건을 캐시 키로 변환 (sessionId 있으면 세션별 캐시)
      */
-    private String generateCacheKey(EventSearchRequest searchRequest, Pageable pageable) {
+    private String generateCacheKey(EventSearchRequest searchRequest, Pageable pageable, String sessionId) {
         StringBuilder keyBuilder = new StringBuilder(SEARCH_CACHE_PREFIX);
+        if (sessionId != null && !sessionId.isBlank()) {
+            keyBuilder.append("session:").append(sessionId).append(":");
+        }
         keyBuilder.append("page:").append(pageable.getPageNumber());
         keyBuilder.append(":size:").append(pageable.getPageSize());
         keyBuilder.append(":sort:").append(pageable.getSort());
-        
+
         if (searchRequest.getStartTime() != null) {
             keyBuilder.append(":start:").append(searchRequest.getStartTime());
         }
@@ -75,10 +78,10 @@ public class CacheService {
     }
 
     /**
-     * 검색 결과 캐시 저장
+     * 검색 결과 캐시 저장 (sessionId 있으면 세션별 키 사용)
      */
-    public Mono<Boolean> cacheSearchResult(EventSearchRequest searchRequest, Pageable pageable, Page<Event> result) {
-        String cacheKey = generateCacheKey(searchRequest, pageable);
+    public Mono<Boolean> cacheSearchResult(EventSearchRequest searchRequest, Pageable pageable, Page<Event> result, String sessionId) {
+        String cacheKey = generateCacheKey(searchRequest, pageable, sessionId);
         
         try {
             String jsonValue = objectMapper.writeValueAsString(result);
@@ -98,8 +101,8 @@ public class CacheService {
     /**
      * 검색 결과 캐시 조회
      */
-    public Mono<Page<Event>> getCachedSearchResult(EventSearchRequest searchRequest, Pageable pageable) {
-        String cacheKey = generateCacheKey(searchRequest, pageable);
+    public Mono<Page<Event>> getCachedSearchResult(EventSearchRequest searchRequest, Pageable pageable, String sessionId) {
+        String cacheKey = generateCacheKey(searchRequest, pageable, sessionId);
         
         return redisTemplate.opsForValue()
                 .get(cacheKey)

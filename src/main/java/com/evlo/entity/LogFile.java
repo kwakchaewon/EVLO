@@ -38,6 +38,10 @@ public class LogFile {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    /** 비회원 세션 구분 (쿠키 EVLO_SESSION). 추후 회원이면 user_id 사용 예정 */
+    @Column(name = "session_id", length = 36)
+    private String sessionId;
+
     @OneToMany(mappedBy = "logFile", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Event> events = new ArrayList<>();

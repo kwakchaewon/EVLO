@@ -19,6 +19,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     // 기본 조회
     Page<Event> findByLogFileId(Long logFileId, Pageable pageable);
 
+    /** 비회원 세션: 해당 세션에서 업로드한 로그의 이벤트만 조회 */
+    Page<Event> findByLogFile_SessionId(String sessionId, Pageable pageable);
+
     // 기간 필터
     Page<Event> findByTimeCreatedBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
 
@@ -60,13 +63,38 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             Pageable pageable
     );
 
+    /** 복합 검색 + 세션 제한 (비회원: 이번 세션 로그만) */
+    @Query("SELECT e FROM Event e JOIN e.logFile lf WHERE lf.sessionId = :sessionId AND " +
+           "(:startTime IS NULL OR e.timeCreated >= :startTime) AND " +
+           "(:endTime IS NULL OR e.timeCreated <= :endTime) AND " +
+           "(:levels IS NULL OR e.level IN :levels) AND " +
+           "(:channels IS NULL OR e.channel IN :channels) AND " +
+           "(:eventIds IS NULL OR e.eventId IN :eventIds) AND " +
+           "(:keyword IS NULL OR LOWER(e.message) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Event> findByFiltersAndSessionId(
+            @Param("sessionId") String sessionId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime,
+            @Param("levels") List<EventLevel> levels,
+            @Param("channels") List<LogChannel> channels,
+            @Param("eventIds") List<Long> eventIds,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
     // Error/Critical Top N 조회
     @Query("SELECT e FROM Event e WHERE e.level IN ('ERROR', 'CRITICAL') ORDER BY e.timeCreated DESC")
     Page<Event> findTopErrorsAndCritical(Pageable pageable);
 
+    @Query("SELECT e FROM Event e JOIN e.logFile lf WHERE lf.sessionId = :sessionId AND e.level IN ('ERROR', 'CRITICAL') ORDER BY e.timeCreated DESC")
+    Page<Event> findTopErrorsAndCriticalBySessionId(@Param("sessionId") String sessionId, Pageable pageable);
+
     // Event ID별 발생 빈도
     @Query("SELECT e.eventId, COUNT(e) as count FROM Event e GROUP BY e.eventId ORDER BY count DESC")
     List<Object[]> findEventIdFrequency();
+
+    @Query("SELECT e.eventId, COUNT(e) as count FROM Event e JOIN e.logFile lf WHERE lf.sessionId = :sessionId GROUP BY e.eventId ORDER BY count DESC")
+    List<Object[]> findEventIdFrequencyBySessionId(@Param("sessionId") String sessionId);
 
     // 시간대별 집중 발생 이벤트 (시간 단위)
     @Query("SELECT FUNCTION('DATE_FORMAT', e.timeCreated, '%Y-%m-%d %H:00:00') as timeSlot, " +
@@ -78,12 +106,31 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             @Param("endTime") LocalDateTime endTime
     );
 
+    @Query("SELECT FUNCTION('DATE_FORMAT', e.timeCreated, '%Y-%m-%d %H:00:00') as timeSlot, " +
+           "COUNT(e) as count FROM Event e JOIN e.logFile lf WHERE lf.sessionId = :sessionId " +
+           "AND e.timeCreated BETWEEN :startTime AND :endTime GROUP BY timeSlot ORDER BY timeSlot")
+    List<Object[]> findEventCountByHourBySessionId(
+            @Param("sessionId") String sessionId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
+
     // 특정 Event ID의 시간대별 발생 빈도
     @Query("SELECT FUNCTION('DATE_FORMAT', e.timeCreated, '%Y-%m-%d %H:00:00') as timeSlot, " +
            "COUNT(e) as count FROM Event e " +
            "WHERE e.eventId = :eventId AND e.timeCreated BETWEEN :startTime AND :endTime " +
            "GROUP BY timeSlot ORDER BY timeSlot")
     List<Object[]> findEventCountByHourForEventId(
+            @Param("eventId") Long eventId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
+
+    @Query("SELECT FUNCTION('DATE_FORMAT', e.timeCreated, '%Y-%m-%d %H:00:00') as timeSlot, " +
+           "COUNT(e) as count FROM Event e JOIN e.logFile lf WHERE lf.sessionId = :sessionId " +
+           "AND e.eventId = :eventId AND e.timeCreated BETWEEN :startTime AND :endTime GROUP BY timeSlot ORDER BY timeSlot")
+    List<Object[]> findEventCountByHourForEventIdBySessionId(
+            @Param("sessionId") String sessionId,
             @Param("eventId") Long eventId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime

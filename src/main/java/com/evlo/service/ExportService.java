@@ -12,6 +12,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,9 +81,9 @@ public class ExportService {
     }
 
     /**
-     * 필터 조건에 맞는 이벤트 조회
+     * 필터 조건에 맞는 이벤트 조회 (sessionId 있으면 비회원 세션 범위로만 조회)
      */
-    public List<Event> fetchEvents(EventSearchRequest searchRequest) {
+    public List<Event> fetchEvents(EventSearchRequest searchRequest, String sessionId) {
         Sort sort = searchRequest.getSortDir().equalsIgnoreCase("ASC")
                 ? Sort.by(searchRequest.getSortBy()).ascending()
                 : Sort.by(searchRequest.getSortBy()).descending();
@@ -89,8 +91,13 @@ public class ExportService {
         Pageable pageable = PageRequest.of(searchRequest.getPage(), searchRequest.getSize(), sort);
 
         Page<Event> eventPage;
-        if (hasFilters(searchRequest)) {
-            eventPage = eventRepository.findByFilters(
+        if (searchRequest.getLogFileId() != null) {
+            eventPage = eventRepository.findByLogFileId(searchRequest.getLogFileId(), pageable);
+        } else if (sessionId == null || sessionId.isBlank()) {
+            eventPage = new PageImpl<>(Collections.emptyList(), pageable, 0);
+        } else if (hasFilters(searchRequest)) {
+            eventPage = eventRepository.findByFiltersAndSessionId(
+                    sessionId,
                     searchRequest.getStartTime(),
                     searchRequest.getEndTime(),
                     searchRequest.getLevels(),
@@ -99,10 +106,8 @@ public class ExportService {
                     searchRequest.getKeyword(),
                     pageable
             );
-        } else if (searchRequest.getLogFileId() != null) {
-            eventPage = eventRepository.findByLogFileId(searchRequest.getLogFileId(), pageable);
         } else {
-            eventPage = eventRepository.findAll(pageable);
+            eventPage = eventRepository.findByLogFile_SessionId(sessionId, pageable);
         }
 
         return eventPage.getContent();
