@@ -17,7 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -54,18 +53,15 @@ public class EventController {
     }
 
     /**
-     * 분석 페이지
+     * 분석 페이지 → 이벤트 조회 페이지로 리다이렉트 (통합)
      */
     @GetMapping("/analysis")
-    public String analysisPage(Model model) {
-        model.addAttribute("title", "분석 - EVLO");
-        model.addAttribute("contentTemplate", "analysis");
-        model.addAttribute("contentFragment", "content");
-        return "layout/base";
+    public String analysisPage() {
+        return "redirect:/events";
     }
 
     /**
-     * 이벤트 리스트 페이지 (검색/필터링 지원)
+     * 이벤트 리스트 페이지 (검색/필터링 + 분석 통합)
      */
     @GetMapping("/events")
     public String eventsPage(
