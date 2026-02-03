@@ -299,9 +299,13 @@
             </div>
         </div><!-- // section-analysis -->
 
-    </div><!-- // content -->
-
     <script>
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = '현재 페이지의 모든 정보가 초기화 됩니다. 진행하시겠습니까?';
+            return e.returnValue;
+        });
+
         function switchTab(tab) {
             const querySection = document.getElementById('section-query');
             const analysisSection = document.getElementById('section-analysis');
@@ -510,5 +514,6 @@
             ]);
         }
     </script>
+    </div><!-- // content -->
 </body>
 </html>
