@@ -50,6 +50,7 @@ public class EventController {
         model.addAttribute("title", "로그 업로드 - EVLO");
         model.addAttribute("contentTemplate", "upload");
         model.addAttribute("contentFragment", "content");
+        model.addAttribute("showEventsNav", false);
         return "layout/base";
     }
 
@@ -138,6 +139,7 @@ public class EventController {
         model.addAttribute("title", "이벤트 조회 - EVLO");
         model.addAttribute("contentTemplate", "events");
         model.addAttribute("contentFragment", "content");
+        model.addAttribute("showEventsNav", false);
         model.addAttribute("events", eventPage.getContent());
         model.addAttribute("currentPage", eventPage.getNumber());
         model.addAttribute("totalPages", eventPage.getTotalPages());
